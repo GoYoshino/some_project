@@ -4,14 +4,8 @@ from typing import BinaryIO, List
 from core.primitives import Int8, Int32, Double, LengthPrefixedString, NoneObject, PrimitiveType
 from core.serialized_object import SerializedObject
 from core.serialized_object_array import SerializedObjectArray, LengthPrefixedStringArray, BinaryTypeEnumArray, BinaryType
+from core.binary_object_string import BinaryObjectString
 
-class ValueType(Enum):
-    Boolean = 0
-    Int32 = 1
-    Double = 2
-    String = 3
-    NullObject = 4
-    Class = 5
 
 
 class ClassInfo(SerializedObjectArray):
@@ -85,6 +79,23 @@ class MemberTypeInfo(SerializedObjectArray):
         additional_info = AdditionalInfo.from_stream(stream, binary_type_enums)
 
         return MemberTypeInfo(binary_type_enums, additional_info)
+
+    def get_binary_type_list(self):
+        result = []
+        for item in self.__binary_type_enums.items:
+            result.append(BinaryType(item.value()))
+
+        return result
+
+    def get_primitive_enum_list(self):
+        result = []
+        for i, item in enumerate(self.__additional_info.items):
+            if self.__binary_type_enums.binary_type_at(i) == BinaryType.Primitive:
+                value = self.__additional_info.get_item(i).value()
+                result.append(PrimitiveType(value))
+            else:
+                result.append(PrimitiveType.NonPrimitive)
+        return result
 
     def __repr__(self):
         return f"[MemberTypeInfo BinaryTypeEnums={self.__binary_type_enums} AdditionalInfos={self.__additional_info}]"

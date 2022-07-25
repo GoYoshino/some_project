@@ -1,14 +1,16 @@
 from enum import Enum
 from typing import BinaryIO
+import struct
 
 from core.math.seven_bits import concat_7bits
 from core.serialized_object import SerializedObject
 
 class PrimitiveType(Enum):
-    Boolean: 1
-    Double: 6
-    Int16: 7
-    Int32: 8
+    NonPrimitive = 999
+    Boolean = 1
+    Double = 6
+    Int16 = 7
+    Int32 = 8
 
 class NoneObject(SerializedObject):
     """
@@ -73,6 +75,9 @@ class Double(SerializedObject):
 
     # I will not implement value() method for this because it is not related to translation work
     # (possibly enables modding?)
+
+    def value(self) -> float:
+        return struct.unpack('<f', self.raw_bytes)[0]
 
     @staticmethod
     def from_stream(handle: BinaryIO):

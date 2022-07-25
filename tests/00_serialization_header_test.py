@@ -1,7 +1,7 @@
 import unittest
 
 from core.primitives import Int8
-from core.record import SerializationHeader
+from core.record_classes import SerializationHeader
 from tests.helpers.bytes_asserts import assertEndOfStream, assertEqualToStream
 
 class SerializationHeaderTest(unittest.TestCase):

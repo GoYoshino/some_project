@@ -1,7 +1,8 @@
 import unittest
 
+from core.loaders.loaders import load_class_with_members_and_types
 from core.primitives import Int8
-from core.record import ClassWithMembersAndTypes
+
 from tests.helpers.bytes_asserts import assertEndOfStream, assertEqualToStream
 
 class ClassWithMembersTest(unittest.TestCase):
@@ -10,7 +11,7 @@ class ClassWithMembersTest(unittest.TestCase):
         with open("data/05_ClassWithMembersAndTypes", "rb") as stream:
             header = Int8.from_stream(stream)
             self.assertEqual(header.raw_bytes, b"\x05")
-            obj = ClassWithMembersAndTypes.from_stream(stream)
+            obj = load_class_with_members_and_types(stream)
 
             assertEndOfStream(self, stream)
             assertEqualToStream(self, obj.raw_bytes, stream)
