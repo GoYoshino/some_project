@@ -92,6 +92,34 @@ class ClassWithMembersAndTypes(Record):
 
         return ClassWithMembersAndTypes(record_type, class_info, member_type_info, library_id)
 
+class BinaryObjectString(Record):
+    """
+    Refers to 06: ClassWithMembersAndTypes Record
+    *Does* care detailed behavior because it is relevant to translation work
+    """
+
+    def __init__(self, record_type: Int8, object_id: Int32, value: LengthPrefixedString):
+        super().__init__(record_type, [object_id, value])
+        self.__value = value
+
+    def get_string(self) -> str:
+        return self.__value.raw_bytes[1:].decode("utf-8")
+
+    def get_length(self) -> int:
+        return self.__value.raw_bytes[0]
+
+    @staticmethod
+    def from_stream(stream: BinaryIO, record_type: Int8):
+        """
+            Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
+            :param stream:
+            :param record_type:
+            :return:
+        """
+        object_id = Int32.from_stream(stream)
+        value = LengthPrefixedString.from_stream(stream)
+        return BinaryObjectString(record_type, object_id, value)
+
 
 class BinaryLibrary(Record):
     """
