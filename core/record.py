@@ -36,7 +36,6 @@ class RecordType(Enum):
     def has_value(cls, value: int):
         return value in cls._value2member_map_
 
-
 class Record(SerializedObjectArray):
 
     def __init__(self, record_type: Int8, items: List[SerializedObject]):
@@ -57,13 +56,13 @@ class SerializationHeader(Record):
         super().__init__(record_type, [root_id, header_id, major_version, minor_version])
 
     @staticmethod
-    def from_stream(stream: BinaryIO, record_type: Int8):
+    def from_stream(stream: BinaryIO):
         """
         Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
         :param stream:
-        :param record_type:
         :return:
         """
+        record_type = Int8.from_stream(BytesIO(b"\x00"))
         root_id = Int32.from_stream(stream)
         header_id = Int32.from_stream(stream)
         major_version = Int32.from_stream(stream)
@@ -79,13 +78,13 @@ class ClassWithMembersAndTypes(Record):
         super().__init__(record_type, [class_info, member_type_info, library_id])
 
     @staticmethod
-    def from_stream(stream: BinaryIO, record_type: Int8):
+    def from_stream(stream: BinaryIO):
         """
             Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
             :param stream:
-            :param record_type:
             :return:
         """
+        record_type = Int8.from_stream(BytesIO(b"\x05"))
         class_info = ClassInfo.from_stream(stream)
         member_type_info = MemberTypeInfo.from_stream(stream, class_info.count())
         library_id = Int32.from_stream(stream)
@@ -109,13 +108,14 @@ class BinaryObjectString(Record):
         return self.__value.raw_bytes[0]
 
     @staticmethod
-    def from_stream(stream: BinaryIO, record_type: Int8):
+    def from_stream(stream: BinaryIO):
         """
             Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
             :param stream:
             :param record_type:
             :return:
         """
+        record_type = Int8.from_stream(BytesIO(b"\x06"))
         object_id = Int32.from_stream(stream)
         value = LengthPrefixedString.from_stream(stream)
         return BinaryObjectString(record_type, object_id, value)
@@ -132,13 +132,14 @@ class BinaryLibrary(Record):
         super().__init__(record_type, [library_id, library_name])
 
     @staticmethod
-    def from_stream(stream: BinaryIO, record_type: Int8):
+    def from_stream(stream: BinaryIO):
         """
             Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
             :param stream:
             :param record_type:
             :return:
         """
+        record_type = Int8.from_stream(BytesIO(b"\x0C"))
         library_id = Int32.from_stream(stream)
         library_name = LengthPrefixedString.from_stream(stream)
         return BinaryLibrary(record_type, library_id, library_name)

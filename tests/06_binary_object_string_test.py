@@ -10,7 +10,7 @@ class BinaryObjectStringTest(unittest.TestCase):
         with open("data/06_BinaryObjectString", "rb") as stream:
             header = Int8.from_stream(stream)
             self.assertEqual(header.raw_bytes, b"\x06")
-            obj = BinaryObjectString.from_stream(stream, header)
+            obj = BinaryObjectString.from_stream(stream)
             self.assertEqual(obj.get_string(), "currency.sgs")
             self.assertEqual(obj.get_length(), 12)
 
