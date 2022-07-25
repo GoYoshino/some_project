@@ -16,3 +16,16 @@ class ClassInfo(SerializedObjectArray):
         member_names = LengthPrefixedStringArray.from_stream(stream, member_count.value())
 
         return ClassInfo(object_id, name, member_count, member_names)
+
+
+class ClassTypeInfo(SerializedObjectArray):
+
+    def __init__(self, type_name: LengthPrefixedString, library_id: Int32):
+        super().__init__([type_name, library_id])
+
+    @staticmethod
+    def from_stream(stream: BinaryIO):
+        type_name = LengthPrefixedString.from_stream(stream)
+        library_id = Int32.from_stream(stream)
+
+        return ClassTypeInfo(type_name, library_id)
