@@ -36,14 +36,12 @@ class RecordType(Enum):
 
 class Record(SerializedObjectArray):
 
-    def __init__(self, items: List[SerializedObject]):
-        record_type_enum: Int8 = items[0]
-        assert isinstance(record_type_enum, Int8)
-        assert RecordType.has_value(record_type_enum.value())
+    def __init__(self, record_type: Int8, items: List[SerializedObject]):
+        assert RecordType.has_value(record_type.value())
 
-        self.record_type = RecordType(record_type_enum.value())
+        self.record_type = RecordType(record_type.value())
 
-        super().__init__(items)
+        super().__init__([record_type] + items)
 
 
 class SerializationHeader(Record):
@@ -54,7 +52,7 @@ class SerializationHeader(Record):
     """
 
     def __init__(self, record_type: Int8, root_id: Int32, header_id: Int32, major_version: Int32, minor_version: Int32):
-        super().__init__([record_type, root_id, header_id, major_version, minor_version])
+        super().__init__(record_type, [root_id, header_id, major_version, minor_version])
 
     @staticmethod
     def from_stream(stream: BinaryIO, record_type: Int8):
@@ -78,7 +76,7 @@ class BinaryLibrary(Record):
     """
 
     def __init__(self, record_type: Int8, library_id: Int32, library_name: LengthPrefixedString):
-        super().__init__([record_type, library_id, library_name])
+        super().__init__(record_type, [library_id, library_name])
 
     @staticmethod
     def from_stream(stream: BinaryIO, record_type: Int8):
