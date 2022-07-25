@@ -1,9 +1,11 @@
 from enum import Enum
-from typing import List, BinaryIO
+from io import BytesIO
+from typing import BinaryIO, List
 
-from core.primitives import Int8, Int32, LengthPrefixedString
+from core.primitives import Int8, Int32, Double, LengthPrefixedString
 from core.serialized_object import SerializedObject
 from core.serialized_object_array import SerializedObjectArray
+from core.structure import ClassInfo, MemberTypeInfo, ValueType, ClassTypeInfo
 
 class RecordType(Enum):
     SerializedStreamHeader = 0
@@ -34,6 +36,7 @@ class RecordType(Enum):
     def has_value(cls, value: int):
         return value in cls._value2member_map_
 
+
 class Record(SerializedObjectArray):
 
     def __init__(self, record_type: Int8, items: List[SerializedObject]):
@@ -42,7 +45,6 @@ class Record(SerializedObjectArray):
         self.record_type = RecordType(record_type.value())
 
         super().__init__([record_type] + items)
-
 
 class SerializationHeader(Record):
     """
@@ -68,9 +70,32 @@ class SerializationHeader(Record):
         minor_version = Int32.from_stream(stream)
         return SerializationHeader(record_type, root_id, header_id, major_version, minor_version)
 
+class ClassWithMembersAndTypes(Record):
+    """
+    Refers to 05: ClassWithMembersAndTypes Record
+    Does not care detailed behavior as long as the instance preserves original raw byte array
+    """
+    def __init__(self, record_type: Int8, class_info: ClassInfo, member_type_info: MemberTypeInfo, library_id: Int32):
+        super().__init__(record_type, [class_info, member_type_info, library_id])
+
+    @staticmethod
+    def from_stream(stream: BinaryIO, record_type: Int8):
+        """
+            Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
+            :param stream:
+            :param record_type:
+            :return:
+        """
+        class_info = ClassInfo.from_stream(stream)
+        member_type_info = MemberTypeInfo.from_stream(stream, class_info.count())
+        library_id = Int32.from_stream(stream)
+
+        return ClassWithMembersAndTypes(record_type, class_info, member_type_info, library_id)
+
+
 class BinaryLibrary(Record):
     """
-    Refers to 00: BinaryLibrary Record
+    Refers to 0C: BinaryLibrary Record
     Does not care detailed behavior as long as the instance preserves original raw byte array
     Because header has nothing to do with translation work
     """

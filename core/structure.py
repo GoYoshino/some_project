@@ -1,13 +1,27 @@
+from enum import Enum
 from typing import BinaryIO, List
 
-from core.primitives import Int8, Int32, LengthPrefixedString, NoneObject, PrimitiveType
+from core.primitives import Int8, Int32, Double, LengthPrefixedString, NoneObject, PrimitiveType
 from core.serialized_object import SerializedObject
 from core.serialized_object_array import SerializedObjectArray, LengthPrefixedStringArray, BinaryTypeEnumArray, BinaryType
+
+class ValueType(Enum):
+    Boolean = 0
+    Int32 = 1
+    Double = 2
+    String = 3
+    NullObject = 4
+    Class = 5
+
 
 class ClassInfo(SerializedObjectArray):
 
     def __init__(self, object_id: Int32, name: LengthPrefixedString, member_count: Int32, member_names: LengthPrefixedStringArray):
+        self.__member_count_value = member_count.value()
         super().__init__([object_id, name, member_count, member_names])
+
+    def count(self):
+        return self.__member_count_value
 
     @staticmethod
     def from_stream(stream: BinaryIO):
@@ -57,6 +71,8 @@ class MemberTypeInfo(SerializedObjectArray):
 
     def __init__(self, binary_type_enums: BinaryTypeEnumArray, additional_info: AdditionalInfo):
         super().__init__([binary_type_enums, additional_info])
+        self.__binary_type_enums = binary_type_enums
+        self.__additional_info = additional_info
 
     @staticmethod
     def from_stream(stream: BinaryIO, count: int):
@@ -64,3 +80,13 @@ class MemberTypeInfo(SerializedObjectArray):
         additional_info = AdditionalInfo.from_stream(stream, binary_type_enums)
 
         return MemberTypeInfo(binary_type_enums, additional_info)
+
+class ObjectNull(SerializedObjectArray):
+    """
+    Refers to 0A: BinaryLibrary Record
+    Does not care detailed behavior as long as the instance preserves original raw byte array
+    Because header has nothing to do with translation work
+    """
+
+    def __init__(self, record_type: Int8):
+        super().__init__([])

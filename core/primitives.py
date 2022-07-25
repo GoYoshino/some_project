@@ -49,6 +49,19 @@ class Int32(SerializedObject):
     def __repr__(self):
         return f"int32({self.value()})"
 
+class Double(SerializedObject):
+
+    def __init__(self, raw_bytes: bytes):
+        super(). __init__(raw_bytes)
+
+    # I will not implement value() method for this because it is not related to translation work
+    # (possibly enables modding?)
+
+    @staticmethod
+    def from_stream(handle: BinaryIO):
+        raw_bytes = handle.read(8)
+        return Double(raw_bytes)
+
 class LengthPrefixedString(SerializedObject):
 
     def __init__(self, raw_bytes: bytes, length: int, string: str):
