@@ -11,7 +11,7 @@ class ReadWholeFileTest(unittest.TestCase):
             assertEqualToStream(self, result.raw_bytes, f)
 
     def test_read_knowledge_file(self):
-        with open("data/specialattacks", "rb") as f:
+        with open("data/baseabilities", "rb") as f:
             result = decode(f)
             assertEqualToStream(self, result.raw_bytes, f)
 

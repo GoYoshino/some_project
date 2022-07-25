@@ -28,5 +28,6 @@ def decode(stream: BinaryIO) -> SerializedObjectArray:
             raise Exception(f"not implemented: {record_type}")
 
         result.append(new_item)
+        print(new_item)
 
     return SerializedObjectArray(result)

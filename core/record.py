@@ -69,6 +69,9 @@ class SerializationHeader(Record):
         minor_version = Int32.from_stream(stream)
         return SerializationHeader(record_type, root_id, header_id, major_version, minor_version)
 
+    def __repr__(self):
+        return "SerializationHeader"
+
 class ClassWithMembersAndTypes(Record):
     """
     Refers to 05: ClassWithMembersAndTypes Record
@@ -76,6 +79,10 @@ class ClassWithMembersAndTypes(Record):
     """
     def __init__(self, record_type: Int8, class_info: ClassInfo, member_type_info: MemberTypeInfo, library_id: Int32):
         super().__init__(record_type, [class_info, member_type_info, library_id])
+
+        self.__class_info = class_info
+        self.__member_type_info = member_type_info
+        self.__library_id = library_id
 
     @staticmethod
     def from_stream(stream: BinaryIO):
@@ -91,6 +98,11 @@ class ClassWithMembersAndTypes(Record):
 
         return ClassWithMembersAndTypes(record_type, class_info, member_type_info, library_id)
 
+    def __repr__(self):
+        return f"ClassWithMembersAndTypes: [{str(self.__class_info)}, {str(self.__member_type_info)}, {str(self.__library_id)}]"
+
+
+
 class BinaryObjectString(Record):
     """
     Refers to 06: ClassWithMembersAndTypes Record
@@ -99,6 +111,7 @@ class BinaryObjectString(Record):
 
     def __init__(self, record_type: Int8, object_id: Int32, value: LengthPrefixedString):
         super().__init__(record_type, [object_id, value])
+        self.__object_id = object_id
         self.__value = value
 
     def get_string(self) -> str:
@@ -119,6 +132,9 @@ class BinaryObjectString(Record):
         object_id = Int32.from_stream(stream)
         value = LengthPrefixedString.from_stream(stream)
         return BinaryObjectString(record_type, object_id, value)
+
+    def __repr__(self):
+        return f"BinaryString(ID={str(self.__object_id)}): {str(self.__value)}"
 
 class MessageEnd(Record):
     """
@@ -152,3 +168,6 @@ class BinaryLibrary(Record):
         library_id = Int32.from_stream(stream)
         library_name = LengthPrefixedString.from_stream(stream)
         return BinaryLibrary(record_type, library_id, library_name)
+
+    def __repr__(self):
+        return "BinaryLibrary"
