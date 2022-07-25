@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, BinaryIO
 
-from core.primitives import Int8, Int32
+from core.primitives import Int8, Int32, LengthPrefixedString
 from core.serialized_object import SerializedObject
 from core.serialized_object_array import SerializedObjectArray
 
@@ -58,9 +58,36 @@ class SerializationHeader(Record):
 
     @staticmethod
     def from_stream(stream: BinaryIO, record_type: Int8):
+        """
+        Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
+        :param stream:
+        :param record_type:
+        :return:
+        """
         root_id = Int32.from_stream(stream)
         header_id = Int32.from_stream(stream)
         major_version = Int32.from_stream(stream)
         minor_version = Int32.from_stream(stream)
         return SerializationHeader(record_type, root_id, header_id, major_version, minor_version)
 
+class BinaryLibrary(Record):
+    """
+    Refers to 00: BinaryLibrary Record
+    Does not care detailed behavior as long as the instance preserves original raw byte array
+    Because header has nothing to do with translation work
+    """
+
+    def __init__(self, record_type: Int8, library_id: Int32, library_name: LengthPrefixedString):
+        super().__init__([record_type, library_id, library_name])
+
+    @staticmethod
+    def from_stream(stream: BinaryIO, record_type: Int8):
+        """
+            Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
+            :param stream:
+            :param record_type:
+            :return:
+        """
+        library_id = Int32.from_stream(stream)
+        library_name = LengthPrefixedString.from_stream(stream)
+        return BinaryLibrary(record_type, library_id, library_name)
