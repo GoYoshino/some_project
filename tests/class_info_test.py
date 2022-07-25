@@ -7,7 +7,6 @@ class ClassInfoTest(unittest.TestCase):
 
     def test_read_from_stream(self):
         with open("data/classinfo", "rb") as stream:
-            pass
             obj = ClassInfo.from_stream(stream)
             assertEndOfStream(self, stream)
             assertEqualToStream(self, obj.raw_bytes, stream)
