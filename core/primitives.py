@@ -1,24 +1,23 @@
 from typing import BinaryIO
 
-class SerializedObject:
-    def __init__(self, raw_bytes: bytes):
-        self.rawBytes = raw_bytes
+from core.serialized_object import SerializedObject
 
 class Int8(SerializedObject):
 
-    def __init__(self, rawBytes: bytes):
-        super().__init__(rawBytes)
+    def __init__(self, raw_bytes: bytes):
+        super().__init__(raw_bytes)
 
     def value(self):
-        return int.from_bytes(self.rawBytes, "little")
+        return int.from_bytes(self.raw_bytes, "little")
 
     @staticmethod
-    def fromStream(handle: BinaryIO):
+    def from_stream(handle: BinaryIO):
         raw_bytes = handle.read(1)
         return Int8(raw_bytes)
 
     def __repr__(self):
         return f"int8({self.value()})"
+
 
 class Int32(SerializedObject):
 
@@ -26,12 +25,12 @@ class Int32(SerializedObject):
         super().__init__(raw_bytes)
 
     def value(self):
-        return int.from_bytes(self.rawBytes, "little")
+        return int.from_bytes(self.raw_bytes, "little")
 
     @staticmethod
-    def fromStream(handle: BinaryIO):
-        rawBytes = handle.read(4)
-        return Int8(rawBytes)
+    def from_stream(handle: BinaryIO):
+        raw_bytes = handle.read(4)
+        return Int32(raw_bytes)
 
     def __repr__(self):
         return f"int32({self.value()})"
@@ -44,7 +43,7 @@ class LengthPrefixedString(SerializedObject):
         self.string = string
 
     @staticmethod
-    def fromStream(handle: BinaryIO):
+    def from_stream(handle: BinaryIO):
         section_string_length = handle.read(1)
         string_length = int.from_bytes(section_string_length, "little")
 
