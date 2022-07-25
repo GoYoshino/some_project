@@ -1,18 +1,14 @@
-from typing import BinaryIO
 import unittest
 
 from core.primitives import LengthPrefixedString
+from tests.helpers.bytes_asserts import assertEndOfStream
 
 class LengthPrefixedStringTest(unittest.TestCase):
-
-    def assertEndOfStream(self, stream: BinaryIO):
-        self.assertEqual(stream.read(1), b"\x0b")
-        self.assertEqual(stream.read(1), b"")
 
     def test_read_from_stream(self):
         with open("data/string", "rb") as stream:
             obj = LengthPrefixedString.from_stream(stream)
-            self.assertEndOfStream(stream)
+            assertEndOfStream(self, stream)
             stream.seek(0)
             expected_raw_bytes = stream.read()[:-1]
 

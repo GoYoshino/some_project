@@ -3,6 +3,7 @@ from typing import BinaryIO
 import unittest
 
 from core.primitives import Int8
+from tests.helpers.bytes_asserts import assertEndOfStream
 
 class Int8Test(unittest.TestCase):
 
@@ -16,7 +17,7 @@ class Int8Test(unittest.TestCase):
 
         obj = Int8.from_stream(stream)
         self.assertEqual(obj.value(), 18)
-        self.assertEndOfStream(stream)
+        assertEndOfStream(self, stream)
         self.assertEqual(obj.raw_bytes, raw_bytes),
 
 if __name__ == '__main__':
