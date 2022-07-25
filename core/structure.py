@@ -19,6 +19,8 @@ class ClassInfo(SerializedObjectArray):
     def __init__(self, object_id: Int32, name: LengthPrefixedString, member_count: Int32, member_names: LengthPrefixedStringArray):
         self.__member_count_value = member_count.value()
         super().__init__([object_id, name, member_count, member_names])
+        self.__object_id = object_id
+        self.__name = name
 
     def count(self):
         return self.__member_count_value
@@ -31,6 +33,9 @@ class ClassInfo(SerializedObjectArray):
         member_names = LengthPrefixedStringArray.from_stream(stream, member_count.value())
 
         return ClassInfo(object_id, name, member_count, member_names)
+
+    def __repr__(self):
+        return f"<ClassInfo: ObjectID={self.__object_id} name={self.__name} MembersCount={self.__member_count_value}>"
 
 class ClassTypeInfo(SerializedObjectArray):
 
@@ -80,6 +85,9 @@ class MemberTypeInfo(SerializedObjectArray):
         additional_info = AdditionalInfo.from_stream(stream, binary_type_enums)
 
         return MemberTypeInfo(binary_type_enums, additional_info)
+
+    def __repr__(self):
+        return f"[MemberTypeInfo BinaryTypeEnums={self.__binary_type_enums} AdditionalInfos={self.__additional_info}]"
 
 class ObjectNull(SerializedObjectArray):
     """

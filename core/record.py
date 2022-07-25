@@ -72,6 +72,28 @@ class SerializationHeader(Record):
     def __repr__(self):
         return "SerializationHeader"
 
+class ClassWithId(Record):
+    """
+    Refers to 01: SerializationHeader Record
+    Does not care detailed behavior as long as the instance preserves original raw byte array
+    Because header has nothing to do with translation work
+    """
+
+    def __init__(self, record_type: Int8, object_id: Int32, metadata_id: Int32):
+        super().__init__(record_type, [object_id, metadata_id])
+
+    @staticmethod
+    def from_stream(stream: BinaryIO):
+        """
+        Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
+        :param stream:
+        :return:
+        """
+        record_type = Int8.from_stream(BytesIO(b"\x01"))
+        object_id = Int32.from_stream(stream)
+        metadata_id = Int32.from_stream(stream)
+        return ClassWithId(record_type, object_id, metadata_id)
+
 class ClassWithMembersAndTypes(Record):
     """
     Refers to 05: ClassWithMembersAndTypes Record

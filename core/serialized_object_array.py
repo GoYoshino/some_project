@@ -32,7 +32,7 @@ class SerializedObjectArray(SerializedObject):
         string = "["
         for item in self.items:
             string += str(item) + ","
-        return string
+        return string[:-1] + "]"
 
 class BinaryTypeEnumArray(SerializedObjectArray):
 
