@@ -10,6 +10,11 @@ class ReadWholeFileTest(unittest.TestCase):
             result = decode(f)
             assertEqualToStream(self, result.raw_bytes, f)
 
+    def test_read_item_file2(self):
+        with open("data/stygiancoin", "rb") as f:
+            result = decode(f)
+            assertEqualToStream(self, result.raw_bytes, f)
+
     def test_read_knowledge_file(self):
         with open("data/baseabilities", "rb") as f:
             result = decode(f)

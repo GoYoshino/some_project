@@ -94,6 +94,9 @@ class ClassWithId(Record):
         metadata_id = Int32.from_stream(stream)
         return ClassWithId(record_type, object_id, metadata_id)
 
+    def __repr__(self):
+        return "[ClassWithID]"
+
 class ClassWithMembersAndTypes(Record):
     """
     Refers to 05: ClassWithMembersAndTypes Record

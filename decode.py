@@ -1,7 +1,7 @@
 from typing import BinaryIO, List
 
 from core.serialized_object_array import SerializedObjectArray
-from core.record import Record, RecordType, SerializationHeader, ClassWithMembersAndTypes, BinaryObjectString, BinaryLibrary, MessageEnd
+from core.record import Record, RecordType, SerializationHeader, ClassWithId, ClassWithMembersAndTypes, BinaryObjectString, BinaryLibrary, MessageEnd
 
 def decode(stream: BinaryIO) -> SerializedObjectArray:
     result = []
@@ -15,6 +15,8 @@ def decode(stream: BinaryIO) -> SerializedObjectArray:
         new_item = None
         if record_type == RecordType.SerializedStreamHeader:
             new_item = SerializationHeader.from_stream(stream)
+        elif record_type == RecordType.ClassWithId:
+            new_item = ClassWithId.from_stream(stream)
         elif record_type == RecordType.ClassWithMembersAndTypes:
             new_item = ClassWithMembersAndTypes.from_stream(stream)
         elif record_type == RecordType.BinaryObjectString:

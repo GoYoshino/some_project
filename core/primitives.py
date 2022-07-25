@@ -7,6 +7,7 @@ from core.serialized_object import SerializedObject
 class PrimitiveType(Enum):
     Boolean: 1
     Double: 6
+    Int16: 7
     Int32: 8
 
 class NoneObject(SerializedObject):
@@ -33,6 +34,21 @@ class Int8(SerializedObject):
     def __repr__(self):
         return f"int8({self.value()})"
 
+class Int16(SerializedObject):
+
+    def __init__(self, raw_bytes: bytes):
+        super().__init__(self.raw_bytes)
+
+    def value(self):
+        return int.from_bytes(self.raw_bytes, "little")
+
+    @staticmethod
+    def from_stream(stream: BinaryIO):
+        raw_bytes = stream.read(2)
+        return Int16(raw_bytes)
+
+    def __repr__(self):
+        return f"int16({self.value()})"
 
 class Int32(SerializedObject):
 
