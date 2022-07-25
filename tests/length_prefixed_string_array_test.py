@@ -10,12 +10,7 @@ class LengthPrefixedStringArrayTest(unittest.TestCase):
         self.assertEqual(stream.read(1), b"\x0b")
         self.assertEqual(stream.read(1), b"")
 
-    def test_read_from_stream_string_array(self):
-        """
-        注: ユニットテスト的になぜこれが入るのか疑問に思うかもしれないが、
-        underrailアーカイブの要素を頭から順に読み取る実装をしていると先にStringのみのArrayがでてくる、という都合から。
-        :return:
-        """
+    def test_read_from_stream(self):
         with open("data/string_array", "rb") as stream:
             array = LengthPrefixedStringArray.from_stream(stream, 19)
             self.assertEndOfStream(stream)
