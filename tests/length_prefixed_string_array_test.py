@@ -2,9 +2,9 @@ from typing import BinaryIO
 import unittest
 
 from core.primitives import LengthPrefixedString
-from core.serialized_object_array import SerializedObjectArray, BinaryType
+from core.serialized_object_array import LengthPrefixedStringArray
 
-class SerializedObjectArrayTest(unittest.TestCase):
+class LengthPrefixedStringArrayTest(unittest.TestCase):
 
     def assertEndOfStream(self, stream: BinaryIO):
         self.assertEqual(stream.read(1), b"\x0b")
@@ -16,9 +16,8 @@ class SerializedObjectArrayTest(unittest.TestCase):
         underrailアーカイブの要素を頭から順に読み取る実装をしていると先にStringのみのArrayがでてくる、という都合から。
         :return:
         """
-        type_list = [BinaryType.String] * 19
         with open("data/string_array", "rb") as stream:
-            array = SerializedObjectArray.from_stream(stream, 19, type_list)
+            array = LengthPrefixedStringArray.from_stream(stream, 19)
             self.assertEndOfStream(stream)
 
             stream.seek(0)
