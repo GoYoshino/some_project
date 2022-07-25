@@ -120,6 +120,15 @@ class BinaryObjectString(Record):
         value = LengthPrefixedString.from_stream(stream)
         return BinaryObjectString(record_type, object_id, value)
 
+class MessageEnd(Record):
+    """
+    Refers to 0B: MessageEnd Record
+    """
+
+    def __init__(self):
+        record_type = Int8.from_stream(BytesIO(b"\x0B"))
+        super().__init__(record_type, [])
+
 
 class BinaryLibrary(Record):
     """
