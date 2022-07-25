@@ -52,3 +52,15 @@ class AdditionalInfo(SerializedObjectArray):
                 raise Exception(f"Not implemented for {binary_type}")
 
         return AdditionalInfo(items)
+
+class MemberTypeInfo(SerializedObjectArray):
+
+    def __init__(self, binary_type_enums: BinaryTypeEnumArray, additional_info: AdditionalInfo):
+        super().__init__([binary_type_enums, additional_info])
+
+    @staticmethod
+    def from_stream(stream: BinaryIO, count: int):
+        binary_type_enums = BinaryTypeEnumArray.from_stream(stream, count)
+        additional_info = AdditionalInfo.from_stream(stream, binary_type_enums)
+
+        return MemberTypeInfo(binary_type_enums, additional_info)
