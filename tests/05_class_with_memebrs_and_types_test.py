@@ -1,6 +1,6 @@
 import unittest
 
-from core.loaders.loaders import load_class_with_members_and_types
+from core.loaders import load_class_with_members_and_types
 from core.primitives import Int8
 
 from tests.helpers.bytes_asserts import assertEndOfStream, assertEqualToStream

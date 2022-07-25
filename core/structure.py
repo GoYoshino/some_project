@@ -99,13 +99,3 @@ class MemberTypeInfo(SerializedObjectArray):
 
     def __repr__(self):
         return f"[MemberTypeInfo BinaryTypeEnums={self.__binary_type_enums} AdditionalInfos={self.__additional_info}]"
-
-class ObjectNull(SerializedObjectArray):
-    """
-    Refers to 0A: BinaryLibrary Record
-    Does not care detailed behavior as long as the instance preserves original raw byte array
-    Because header has nothing to do with translation work
-    """
-
-    def __init__(self, record_type: Int8):
-        super().__init__([])
