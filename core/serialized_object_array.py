@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import List, BinaryIO
 
+from core.primitives import Int8, LengthPrefixedString
 from core.serialized_object import SerializedObject
-from core.primitives import LengthPrefixedString
 
 class BinaryType(Enum):
     Primitive = 0
@@ -17,7 +17,7 @@ class BinaryType(Enum):
 class SerializedObjectArray(SerializedObject):
 
     def __init__(self, items: List[SerializedObject]):
-        self.__items = items
+        self.items = items
         raw_bytes = b""
         for item in items:
             raw_bytes += item.raw_bytes
@@ -25,14 +25,29 @@ class SerializedObjectArray(SerializedObject):
         super().__init__(raw_bytes)
 
     def get_item(self, index: int) -> SerializedObject:
-        assert index < len(self.__items), f"index out of bounds: {index} for Array[{len(self.__items)}]"
-        return self.__items[index]
+        assert index < len(self.items), f"index out of bounds: {index} for Array[{len(self.items)}]"
+        return self.items[index]
 
     def __repr__(self):
         string = "["
-        for item in self.__items:
+        for item in self.items:
             string += str(item) + ","
         return string
+
+class BinaryTypeEnumArray(SerializedObjectArray):
+
+    def __init__(self, items: List[Int8]):
+        super().__init__(items)
+
+    def binary_type_at(self, index: int) -> BinaryType:
+        return BinaryType(self.items[index].value())
+
+    @staticmethod
+    def from_stream(stream: BinaryIO, count: int):
+        items = []
+        for i in range(count):
+            items.append(Int8.from_stream(stream))
+        return BinaryTypeEnumArray(items)
 
 class LengthPrefixedStringArray(SerializedObjectArray):
 
