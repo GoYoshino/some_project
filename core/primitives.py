@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import BinaryIO
 
+from core.math.seven_bits import concat_7bits
 from core.serialized_object import SerializedObject
 
 class PrimitiveType(Enum):
@@ -71,13 +72,22 @@ class LengthPrefixedString(SerializedObject):
 
     @staticmethod
     def from_stream(handle: BinaryIO):
-        section_string_length = handle.read(1)
-        string_length = int.from_bytes(section_string_length, "little")
+        raw_length_bytes = b""
+        length_byte_list = []
+        for i in range(5):
+            new_byte = handle.read(1)
+            raw_length_bytes += new_byte
+            length_byte_list.append(new_byte[0])
+
+            if new_byte[0] & 0b10000000 == 0:
+                break
+
+        string_length = concat_7bits(length_byte_list)
 
         section_string = handle.read(string_length)
         string = section_string.decode("utf-8")
 
-        raw_bytes = section_string_length + section_string
+        raw_bytes = raw_length_bytes + section_string
         return LengthPrefixedString(raw_bytes, string_length, string)
 
     def __repr__(self):
