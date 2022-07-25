@@ -1,6 +1,20 @@
+from enum import Enum
 from typing import BinaryIO
 
 from core.serialized_object import SerializedObject
+
+class PrimitiveType(Enum):
+    Boolean: 1
+    Double: 6
+    Int32: 8
+
+class NoneObject(SerializedObject):
+    """
+    None, does not pose any
+    """
+
+    def __init__(self):
+        super().__init__(b"")
 
 class Int8(SerializedObject):
 

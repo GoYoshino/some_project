@@ -42,6 +42,9 @@ class BinaryTypeEnumArray(SerializedObjectArray):
     def binary_type_at(self, index: int) -> BinaryType:
         return BinaryType(self.items[index].value())
 
+    def count(self):
+        return len(self.items)
+
     @staticmethod
     def from_stream(stream: BinaryIO, count: int):
         items = []
