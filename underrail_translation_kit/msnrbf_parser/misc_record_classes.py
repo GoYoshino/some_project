@@ -128,7 +128,7 @@ class ArraySingleString(Record):
             elif header.raw_bytes == b"\x0A":
                 values.append(NoneObject())
             elif header.raw_bytes == b"\x0D":   # 0D_ObjectNullMultiple256
-                object_null = ObjectNull256.from_stream(stream)
+                object_null = ObjectNullMultiple256.from_stream(stream)
                 values.append(object_null)
                 remaining_null_objects += object_null.get_count()
             else:
@@ -154,4 +154,4 @@ class ObjectNullMultiple256(Record):
         # TODO: このfrom_streamみたいなやつを直で生成できるIFを作る
         record_type = Int8.from_stream(BytesIO(b"\x0D"))
         null_count = Int8.from_stream(stream)
-        return ObjectNull256(record_type, null_count)
+        return ObjectNullMultiple256(record_type, null_count)
