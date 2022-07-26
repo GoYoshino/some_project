@@ -23,7 +23,7 @@ class BinaryObjectString(Record):
         return self.__value.length
 
     def get_object_id(self) -> int:
-        return self.__object_id
+        return self.__object_id.value()
 
     def replace_string(self, string: str) -> None:
         self.__value.replace_string(string)

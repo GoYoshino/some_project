@@ -13,12 +13,11 @@ class RecalcTest(unittest.TestCase):
             result = parse_binary_stream(f)
             assertEqualToStream(self, result.raw_bytes, f)
 
-        result.replace_text(LOREM, "C00.I:D")
-        description = result.get_member_class("C00").get_string_member("I:D")
-        self.assertEqual(description.get_length(), 1158)
-        self.assertEqual(description.get_string(), LOREM)
-
-        result.recalc_raw_bytes()
+        #print(result.get_member_class_dict())
+        dic = result.get_member_class_dict()
+        result.replace_text(LOREM, 6)
+        self.assertEqual(result.get_text(6), LOREM)
+        self.assertEqual(len(result.get_text(6)), 1158)
 
         with open("msnrbf_parser/data/sgscredits_changed", "rb") as f2:
             assertEqualToStream(self, result.raw_bytes, f2)

@@ -35,7 +35,7 @@ class ClassWithMembersAndTypes(Record):
             item = self.__values.get_item(i)
             if isinstance(item, MemberReference):
                 continue
-            assert isinstance(item, BinaryObjectString), f"not a BinaryString: {item}"
+            assert isinstance(item, BinaryObjectString), f"not a BinaryObjectString: {item}"
             item_bos: BinaryObjectString = item
             dictionary[item_bos.get_object_id()] = item
 
