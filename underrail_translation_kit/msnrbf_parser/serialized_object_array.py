@@ -50,6 +50,12 @@ class BinaryTypeEnumArray(SerializedObjectArray):
             items.append(Int8.from_stream(stream))
         return BinaryTypeEnumArray(items)
 
+    def __repr__(self):
+        string = "["
+        for i, item in enumerate(self.items):
+            string += f"{self.binary_type_at(i).name}, "
+        return string + "]"
+
 class LengthPrefixedStringArray(SerializedObjectArray):
 
     def __init__(self, items: List[LengthPrefixedString]):
