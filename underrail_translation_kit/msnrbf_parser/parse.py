@@ -1,12 +1,12 @@
 from typing import BinaryIO
 
 from .binary_object_string import BinaryObjectString
-from .serialized_object_array import SerializedObjectArray
+from .parse_result import ParseResult
 from .record import RecordType
 from .misc_record_classes import SerializationHeader, BinaryLibrary, MessageEnd
 from .loaders import load_class_with_members_and_types
 
-def parse_binary_stream(stream: BinaryIO) -> SerializedObjectArray:
+def parse_binary_stream(stream: BinaryIO) -> ParseResult:
     result = []
 
     while (True):
@@ -35,4 +35,4 @@ def parse_binary_stream(stream: BinaryIO) -> SerializedObjectArray:
         result.append(new_item)
         print(new_item)
 
-    return SerializedObjectArray(result)
+    return ParseResult(result)

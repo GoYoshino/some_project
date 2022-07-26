@@ -36,11 +36,11 @@ class ClassWithMembersAndTypes(Record):
 
         self.__string_member_dictionary = dictionary
 
+    def has_string_member(self, member_name: str) -> bool:
+        return member_name in self.__string_member_dictionary.keys()
+
     def get_string_member(self, member_name: str) -> BinaryObjectString:
-        if member_name not in self.__string_member_dictionary.keys():
-            raise Exception(f"member '{member_name}' not found")
-        else:
-            return self.__string_member_dictionary[member_name]
+        return self.__string_member_dictionary[member_name]
 
     def get_name(self) -> str:
         return self.__class_info.get_name()
