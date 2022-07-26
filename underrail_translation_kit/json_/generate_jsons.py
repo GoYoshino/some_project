@@ -1,3 +1,4 @@
+import json
 import fnmatch
 import os
 from pathlib import Path
@@ -8,8 +9,8 @@ from underrail_translation_kit.unpacker import unpack_as_stream
 from underrail_translation_kit.msnrbf_parser import ParseResult, parse_binary_stream
 
 # now constant for development. will be command line in future
-UNDERRAIL_DATA_DIR = r"D:\SteamLibrary\steamapps\common\Underrail\backup\data"
-JSON_OUT_DIR = "D:/underrail_json"
+UNDERRAIL_DATA_DIR = Path(r"D:\SteamLibrary\steamapps\common\Underrail\backup\data")
+JSON_OUT_DIR = Path("D:/underrail_json")
 
 TARGETS = [
     "*.k",
@@ -78,5 +79,10 @@ if __name__ == "__main__":
         os.makedirs(save_dir, exist_ok=True)
 
         obj = load_object(path)
-        json = generate_whole_extract_json(obj)
-        print(json)
+        json_data = generate_whole_extract_json(obj)
+
+        save_path = JSON_OUT_DIR.joinpath(relative_path)
+        save_path = os.path.splitext(str(save_path))[0] + ".json"
+        print(save_path)
+        with open(save_path, "w") as f:
+            json.dump(json_data, f, indent=4)
