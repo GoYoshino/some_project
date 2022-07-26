@@ -1,15 +1,14 @@
 from typing import BinaryIO
 
 from .binary_object_string import BinaryObjectString
-from .class_with_id import ClassWithID
-from .loaders import load_class_with_members_and_types
+from .loaders import load_class_with_members_and_types, load_class_with_id
 from .misc_record_classes import SerializationHeader, BinaryLibrary, MessageEnd
 from .parse_result import ParseResult
 from .record import RecordType
 
 def parse_binary_stream(stream: BinaryIO) -> ParseResult:
     result = []
-    class_info_dict = {}
+    class_info_dict = {}    # TODO: もっと強力な情報統合を可能にするラッパを作ってここにハメてもよい
 
     while (True):
         header = stream.read(1)
@@ -21,7 +20,7 @@ def parse_binary_stream(stream: BinaryIO) -> ParseResult:
         if record_type == RecordType.SerializedStreamHeader:
             new_item = SerializationHeader.from_stream(stream)
         elif record_type == RecordType.ClassWithId:
-            new_item = ClassWithID.from_stream(stream, class_info_dict)
+            new_item = load_class_with_id(stream, class_info_dict)
         elif record_type == RecordType.ClassWithMembersAndTypes:
             new_item = load_class_with_members_and_types(stream, class_info_dict)
         elif record_type == RecordType.BinaryObjectString:

@@ -2,6 +2,7 @@ from io import BytesIO
 from typing import BinaryIO, Tuple, Dict
 
 from .binary_object_string import BinaryObjectString
+from .class_with_id import ClassWithID
 from .class_with_members_and_types import ClassWithMembersAndTypes
 from .enums import BinaryType, PrimitiveType
 from .misc_record_classes import MemberReference
@@ -24,7 +25,9 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
             new_item = BinaryObjectString.from_stream(stream)
         elif type == BinaryType.Class:
             header = stream.read(1)  # increment stream pointer
-            if header == b"\x05":   # 05_ClassWithMembersAndTypes
+            if header == b"\x01":   # 01_ClassWithID
+                new_item = load_class_with_id(stream, class_info_dict)
+            elif header == b"\x05":   # 05_ClassWithMembersAndTypes
                 new_item = load_class_with_members_and_types(stream, class_info_dict)
             elif header == b"\x09":
                 new_item = MemberReference.from_stream(stream)
@@ -72,3 +75,12 @@ def load_class_with_members_and_types(stream: BinaryIO, class_info_dict: Dict[in
     values = load_values(stream, (class_info, member_type_info), class_info_dict)
 
     return ClassWithMembersAndTypes(record_type, class_info, member_type_info, library_id, values)
+
+def load_class_with_id(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
+        record_type = Int8.from_stream(BytesIO(b"\x01"))
+        object_id = Int32.from_stream(stream)
+        metadata_id = Int32.from_stream(stream)
+
+        class_info = class_info_dict[metadata_id.value()]
+        values = load_values(stream, class_info, class_info_dict)
+        return ClassWithID(record_type, object_id, metadata_id, values, class_info)
