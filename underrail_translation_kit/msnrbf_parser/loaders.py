@@ -41,6 +41,8 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
                 new_item = Int16.from_stream(stream)
             elif prim_type == PrimitiveType.Int32:
                 new_item = Int32.from_stream(stream)
+            elif prim_type == PrimitiveType.Int64:
+                new_item = KnickKnack.from_stream(stream, 8)
             elif prim_type == PrimitiveType.Double:
                 new_item = Double.from_stream(stream)
             elif prim_type == PrimitiveType.Single:
