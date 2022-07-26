@@ -2,6 +2,7 @@ from enum import Enum
 from typing import BinaryIO
 import struct
 
+from .enums import RecordType
 from .math_ import concat_7bits, divide_to_7bits
 from .serialized_object import SerializedObject
 from .util import lf_to_crlf
@@ -16,6 +17,13 @@ class NoneObject(SerializedObject):
 
     def __repr__(self):
         return "(None)"
+
+class RecordHeader(SerializedObject):
+
+    def __init__(self, record_type: RecordType):
+        raw_bytes = record_type.value.to_bytes(1, "little")
+        self.record_type = record_type
+        super().__init__(raw_bytes)
 
 class Int8(SerializedObject):
 
