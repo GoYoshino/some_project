@@ -50,7 +50,7 @@ class Int8(SerializedObject):
 class Int16(SerializedObject):
 
     def __init__(self, raw_bytes: bytes):
-        super().__init__(self.raw_bytes)
+        super().__init__(raw_bytes)
 
     def value(self):
         return int.from_bytes(self.raw_bytes, "little")

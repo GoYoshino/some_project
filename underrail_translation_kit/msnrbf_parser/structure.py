@@ -73,6 +73,8 @@ class AdditionalInfo(SerializedObjectArray):
                 items.append(ClassTypeInfo.from_stream(stream))
             elif binary_type == BinaryType.String or binary_type == BinaryType.Object or binary_type == BinaryType.StringArray:
                 items.append(NoneObject())
+            elif binary_type == BinaryType.SystemClass:
+                items.append(LengthPrefixedString.from_stream(stream))
             else:
                 raise Exception(f"Not implemented for {binary_type}")
 
