@@ -31,6 +31,9 @@ class RecordHeader(SerializedObject):
         record_type = int.from_bytes(result, "little")
         return RecordHeader(RecordType(record_type))
 
+    def __repr__(self):
+        return f"Header:{self.record_type.name}({hex(self.record_type.value)})"
+
 class Int8(SerializedObject):
 
     def __init__(self, raw_bytes: bytes):
