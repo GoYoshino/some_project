@@ -14,6 +14,9 @@ class NoneObject(SerializedObject):
     def __init__(self):
         super().__init__(b"")
 
+    def __repr__(self):
+        return "(None)"
+
 class Int8(SerializedObject):
 
     def __init__(self, raw_bytes: bytes):
@@ -77,6 +80,23 @@ class Double(SerializedObject):
     def from_stream(handle: BinaryIO):
         raw_bytes = handle.read(8)
         return Double(raw_bytes)
+
+class KnickKnack(SerializedObject):
+    """
+    Who cares detailed internal of it as long as it preserves original raw bytes
+    """
+
+    def __init__(self, raw_bytes: bytes, size: int):
+        super().__init__(raw_bytes)
+        self.__size = size
+
+    @staticmethod
+    def from_stream(stream: BinaryIO, size: int):
+        raw_bytes = stream.read(size)
+        return KnickKnack(raw_bytes, size)
+
+    def __repr__(self):
+        return f"KnickKnack({self.__size})"
 
 class LengthPrefixedString(SerializedObject):
 

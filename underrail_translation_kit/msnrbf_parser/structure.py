@@ -28,6 +28,9 @@ class ClassInfo(SerializedObjectArray):
     def get_name(self) -> str:
         return self.__name.string
 
+    def get_object_id(self) -> int:
+        return self.__object_id.value()
+
     @staticmethod
     def from_stream(stream: BinaryIO):
         object_id = Int32.from_stream(stream)
@@ -38,7 +41,7 @@ class ClassInfo(SerializedObjectArray):
         return ClassInfo(object_id, name, member_count, member_names)
 
     def __repr__(self):
-        return f"<ClassInfo: ObjectID={self.__object_id} name={self.__name} MembersCount={self.__member_count_value}>"
+        return f"<ClassInfo: ObjectID={self.__object_id} name={self.__name} MembersCount={self.__member_count_value} MemberNames={self.__member_names}>"
 
 class ClassTypeInfo(SerializedObjectArray):
 

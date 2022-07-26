@@ -1,3 +1,5 @@
+from typing import Dict, Tuple
+
 from .binary_object_string import BinaryObjectString
 from .enums import BinaryType
 from .primitives import Int8, Int32
@@ -42,6 +44,9 @@ class ClassWithMembersAndTypes(Record):
     def get_string_member(self, member_name: str) -> BinaryObjectString:
         return self.__string_member_dictionary[member_name]
 
+    def get_string_member_dict(self) -> Dict[str, BinaryObjectString]:
+        return self.__string_member_dictionary
+
     def get_name(self) -> str:
         return self.__class_info.get_name()
 
@@ -54,3 +59,6 @@ class ClassWithMembersAndTypes(Record):
         if not self.has_string_member(member_name):
             raise Exception(f"{self} does not have member '{member_name}'")
         self.get_string_member(member_name).replace_string(new_string)
+
+    def get_class_info_tuple(self) -> Tuple[ClassInfo, MemberTypeInfo]:
+        return (self.__class_info, self.__member_type_info)

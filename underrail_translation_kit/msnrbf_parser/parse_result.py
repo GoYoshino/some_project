@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from .serialized_object import SerializedObject
 from .serialized_object_array import SerializedObjectArray
@@ -45,6 +45,9 @@ class ParseResult(SerializedObjectArray):
 
         if self.has_member_class(paths[0]):
             return self.get_member_class(paths[0]).get_text(paths[1])
+
+    def get_all_member_class(self) -> Dict[str, ClassWithMembersAndTypes]:
+        return self.__dictionary
 
     def has_member_class(self, name: str) -> bool:
         return name in self.__dictionary.keys()

@@ -45,3 +45,4 @@ class PrimitiveType(Enum):
     Double = 6
     Int16 = 7
     Int32 = 8
+    Single = 11

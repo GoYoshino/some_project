@@ -1,13 +1,15 @@
 from typing import BinaryIO
 
 from .binary_object_string import BinaryObjectString
+from .class_with_id import ClassWithID
+from .loaders import load_class_with_members_and_types
+from .misc_record_classes import SerializationHeader, BinaryLibrary, MessageEnd
 from .parse_result import ParseResult
 from .record import RecordType
-from .misc_record_classes import SerializationHeader, BinaryLibrary, MessageEnd
-from .loaders import load_class_with_members_and_types
 
 def parse_binary_stream(stream: BinaryIO) -> ParseResult:
     result = []
+    class_info_dict = {}
 
     while (True):
         header = stream.read(1)
@@ -18,10 +20,10 @@ def parse_binary_stream(stream: BinaryIO) -> ParseResult:
         new_item = None
         if record_type == RecordType.SerializedStreamHeader:
             new_item = SerializationHeader.from_stream(stream)
-        #elif record_type == RecordType.ClassWithId:
-        #    new_item = ClassWithId.from_stream(stream)
+        elif record_type == RecordType.ClassWithId:
+            new_item = ClassWithID.from_stream(stream, class_info_dict)
         elif record_type == RecordType.ClassWithMembersAndTypes:
-            new_item = load_class_with_members_and_types(stream)
+            new_item = load_class_with_members_and_types(stream, class_info_dict)
         elif record_type == RecordType.BinaryObjectString:
             new_item = BinaryObjectString.from_stream(stream)
         elif record_type == RecordType.BinaryLibrary:
@@ -33,6 +35,6 @@ def parse_binary_stream(stream: BinaryIO) -> ParseResult:
             raise Exception(f"not implemented: {record_type}")
 
         result.append(new_item)
-        print(new_item)
+        #print(new_item)
 
     return ParseResult(result)
