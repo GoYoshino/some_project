@@ -54,6 +54,10 @@ class PrimitiveType(Enum):
     TimeSpan = 12
     DateTime = 13
     UInt16 = 14
+    UInt32 = 15
+    UInt64 = 16
+    Null = 17
+    String = 18
 
 class BinaryArrayType(Enum):
     Single = 0

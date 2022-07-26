@@ -2,7 +2,7 @@ from io import BytesIO
 from typing import BinaryIO
 
 from .binary_object_string import BinaryObjectString
-from .primitives import Int8, Int32, LengthPrefixedString, KnickKnack
+from .primitives import Int8, Int32, LengthPrefixedString, KnickKnack, NoneObject
 from .record import Record
 from .serialized_object import SerializedObject
 from .serialized_object_array import SerializedObjectArray
@@ -119,8 +119,11 @@ class ArraySingleString(Record):
         values = []
         for i in range(length):
             header = Int8.from_stream(stream)
-            # may come across primitive strings in future?
-            assert header.raw_bytes == b"\x06", f"Unexpected header: {header}"
-            values.append(BinaryObjectString.from_stream(stream))
+            if header.raw_bytes == b"\x06":
+                values.append(BinaryObjectString.from_stream(stream))
+            elif header.raw_bytes == b"\x0A":
+                values.append(NoneObject())
+            else:
+                raise Exception(f"Unexpected header: {header}")
 
         return ArraySingleString(record_type, array_info, SerializedObjectArray(values))

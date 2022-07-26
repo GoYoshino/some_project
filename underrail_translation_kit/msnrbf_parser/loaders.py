@@ -47,6 +47,8 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
                 new_item = Double.from_stream(stream)
             elif prim_type == PrimitiveType.Single:
                 new_item = KnickKnack.from_stream(stream, 4)
+            elif prim_type == PrimitiveType.UInt32:
+                new_item = KnickKnack.from_stream(stream, 4)
             else:
                 raise Exception(f"Not Implemented: {prim_type}")
         elif type == BinaryType.Object:
