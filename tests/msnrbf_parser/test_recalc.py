@@ -13,8 +13,8 @@ class RecalcTest(unittest.TestCase):
             result = parse_binary_stream(f)
             assertEqualToStream(self, result.raw_bytes, f)
 
+        result.replace_text(LOREM, "C00.I:D")
         description = result.get_member_class("C00").get_string_member("I:D")
-        description.replace_string(LOREM)
         self.assertEqual(description.get_length(), 1158)
         self.assertEqual(description.get_string(), LOREM)
 

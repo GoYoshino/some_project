@@ -44,3 +44,8 @@ class ClassWithMembersAndTypes(Record):
 
     def get_name(self) -> str:
         return self.__class_info.get_name()
+
+    def replace_text(self, new_string: str, member_name: str) -> None:
+        if not self.has_string_member(member_name):
+            raise Exception(f"{self} does not have member '{member_name}'")
+        self.get_string_member(member_name).replace_string(new_string)
