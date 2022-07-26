@@ -4,6 +4,7 @@ from typing import BinaryIO, Tuple, Dict
 from .binary_object_string import BinaryObjectString
 from .class_with_id import ClassWithID
 from .class_with_members_and_types import ClassWithMembersAndTypes
+from .system_class_with_members_and_types import SystemClassWithMembersAndTypes
 from .enums import BinaryType, PrimitiveType, BinaryArrayType
 from .misc_record_classes import MemberReference, BinaryArray, ArraySingleString
 from .object_null import ObjectNull
@@ -43,6 +44,8 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
         elif type == BinaryType.Primitive:
             prim_type = primitive_type_list[i]
             if prim_type == PrimitiveType.Boolean:
+                new_item = KnickKnack.from_stream(stream, 1)
+            elif prim_type == PrimitiveType.Byte:
                 new_item = Int8.from_stream(stream)
             elif prim_type == PrimitiveType.Int16:
                 new_item = Int16.from_stream(stream)
@@ -71,6 +74,14 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
                 new_item = MemberReference.from_stream(stream)
             else:
                 raise Exception(f"unexpected header: {header}")
+        elif type == BinaryType.SystemClass:
+            header = stream.read(1)
+            if header == b"\x04":
+                new_item = load_system_class_with_members_and_types(stream, class_info_dict)
+            elif header == b"\x09":
+                new_item = MemberReference.from_stream(stream)
+            else:
+                raise Exception(f"unexpected header: {header}")
         else:
             raise Exception(f"Not Implemented: {type}")
 
@@ -78,12 +89,23 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
 
     return ValueArray(items)
 
-def load_class_with_members_and_types(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ClassWithMembersAndTypes:
+def load_system_class_with_members_and_types(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SystemClassWithMembersAndTypes:
     """
         Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
-        :param stream:
-        :return:
     """
+    record_type = Int8.from_stream(BytesIO(b"\x04"))
+    class_info = ClassInfo.from_stream(stream)
+    object_id = class_info.get_object_id()
+    member_type_info = MemberTypeInfo.from_stream(stream, class_info.count())
+
+    class_info_dict[object_id] = (class_info, member_type_info)
+
+    values = load_values(stream, (class_info, member_type_info), class_info_dict)
+
+    return SystemClassWithMembersAndTypes(record_type, class_info, member_type_info, values)
+
+def load_class_with_members_and_types(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ClassWithMembersAndTypes:
+
     record_type = Int8.from_stream(BytesIO(b"\x05"))
     class_info = ClassInfo.from_stream(stream)
     object_id = class_info.get_object_id()
