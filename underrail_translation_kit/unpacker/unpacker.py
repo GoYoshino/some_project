@@ -1,6 +1,7 @@
 from io import BytesIO
 from typing import BinaryIO
-import gzip
+
+from .util import AltGzipFile
 
 def unpack_as_stream(filename: str) -> BinaryIO:
     byte_array = unpack(filename)
@@ -9,4 +10,4 @@ def unpack_as_stream(filename: str) -> BinaryIO:
 def unpack(filename: str) -> bytes:
     with open(filename, "rb") as f:
         f.seek(24)
-        return gzip.GzipFile(fileobj=f, mode="rb").read()
+        return AltGzipFile(fileobj=f, mode="rb").read()
