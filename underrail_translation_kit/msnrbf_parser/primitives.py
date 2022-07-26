@@ -2,9 +2,9 @@ from enum import Enum
 from typing import BinaryIO
 import struct
 
-from .math_ import concat_7bits
+from .math_ import concat_7bits, divide_to_7bits
 from .serialized_object import SerializedObject
-
+from .util import lf_to_crlf
 
 class NoneObject(SerializedObject):
     """
@@ -84,6 +84,17 @@ class LengthPrefixedString(SerializedObject):
         super().__init__(raw_bytes)
         self.length = length
         self.string = string
+
+    def replace_string(self, string: str) -> None:
+        string = lf_to_crlf(string)
+        new_string_bytes = bytes(string, "utf-8")
+        byte_length = len(new_string_bytes)
+
+        prefix_bytes = divide_to_7bits(byte_length)
+
+        self.raw_bytes = prefix_bytes + new_string_bytes
+        self.string = string
+        self.length = byte_length
 
     @staticmethod
     def from_stream(handle: BinaryIO):

@@ -28,23 +28,23 @@ def concat_7bits(byte_list: List[int]):
 
     return number
 
-def divide_to_7bits(number: int) -> List[int]:
+def divide_to_7bits(number: int) -> bytes:
 
-    byte_list = []
+    byte_result = b""
 
     while (True):
         logger.debug(f"number: {bin(number)} = {hex(number)}")
 
         if number > 128:
             new_number = 0b10000000 | (number & 0b1111111)
-            byte_list.append(new_number)
+            byte_result += new_number.to_bytes(1, "little")
             logger.debug(f"number to be added: {bin(new_number)} = {hex(new_number)}")
             number = number >> 7
             logger.debug(f"shifted to: {bin(number)} = {hex(number)}")
         else:
             new_number = number
             logger.debug(f"number to be added: {bin(new_number)} = {hex(new_number)}")
-            byte_list.append(new_number)
+            byte_result += new_number.to_bytes(1, "little")
             break
 
-    return byte_list
+    return byte_result

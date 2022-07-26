@@ -25,6 +25,13 @@ class SerializedObjectArray(SerializedObject):
             string += str(item) + ","
         return string[:-1] + "]"
 
+    def recalc_raw_bytes(self):
+        raw_bytes = b""
+        for item in self.items:
+            item.recalc_raw_bytes()
+            raw_bytes += item.raw_bytes
+        self.raw_bytes = raw_bytes
+
 class BinaryTypeEnumArray(SerializedObjectArray):
 
     def __init__(self, items: List[Int8]):

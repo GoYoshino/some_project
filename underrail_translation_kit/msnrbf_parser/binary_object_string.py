@@ -16,10 +16,14 @@ class BinaryObjectString(Record):
         self.__value = value
 
     def get_string(self) -> str:
-        return self.__value.raw_bytes[1:].decode("utf-8")
+        return self.__value.string
 
     def get_length(self) -> int:
-        return self.__value.raw_bytes[0]
+        return self.__value.length
+
+    def replace_string(self, string: str) -> None:
+        self.__value.replace_string(string)
+        self.recalc_raw_bytes()
 
     @staticmethod
     def from_stream(stream: BinaryIO):
