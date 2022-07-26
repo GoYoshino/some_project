@@ -117,13 +117,41 @@ class ArraySingleString(Record):
         length = array_info.get_length()
 
         values = []
+        remaining_null_objects = 0
         for i in range(length):
+            if (remaining_null_objects > 0):
+                remaining_null_objects -= 1
+                continue
             header = Int8.from_stream(stream)
             if header.raw_bytes == b"\x06":
                 values.append(BinaryObjectString.from_stream(stream))
             elif header.raw_bytes == b"\x0A":
                 values.append(NoneObject())
+            elif header.raw_bytes == b"\x0D":   # 0D_ObjectNullMultiple256
+                object_null = ObjectNull256.from_stream(stream)
+                values.append(object_null)
+                remaining_null_objects += object_null.get_count()
             else:
                 raise Exception(f"Unexpected header: {header}")
 
         return ArraySingleString(record_type, array_info, SerializedObjectArray(values))
+
+
+class ObjectNullMultiple256(Record):
+    """
+    Refers to 0D: ObjectNullMultiple256 Record
+    """
+
+    def __init__(self, record_type: Int8, null_count: Int8):
+        super().__init__(record_type, [null_count])
+        self.__count = null_count
+
+    def get_count(self) -> int:
+        return self.__count.value()
+
+    @staticmethod
+    def from_stream(stream: BinaryIO):
+        # TODO: このfrom_streamみたいなやつを直で生成できるIFを作る
+        record_type = Int8.from_stream(BytesIO(b"\x0D"))
+        null_count = Int8.from_stream(stream)
+        return ObjectNull256(record_type, null_count)
