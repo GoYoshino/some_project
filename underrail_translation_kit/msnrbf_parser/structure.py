@@ -13,9 +13,20 @@ class ClassInfo(SerializedObjectArray):
         super().__init__([object_id, name, member_count, member_names])
         self.__object_id = object_id
         self.__name = name
+        self.__member_names = member_names
 
-    def count(self):
+    def count(self) -> int:
         return self.__member_count_value
+
+    def get_member_name_list(self) -> List[str]:
+        result = []
+        for i in range(self.__member_count_value):
+            result.append(self.__member_names.get_item(i).string)
+
+        return result
+
+    def get_name(self) -> str:
+        return self.__name.string
 
     @staticmethod
     def from_stream(stream: BinaryIO):

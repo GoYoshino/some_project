@@ -16,5 +16,9 @@ class ClassWithMembersTest(unittest.TestCase):
             assertEndOfStream(self, stream)
             assertEqualToStream(self, obj.raw_bytes, stream)
 
+        self.assertEqual(obj.get_name(), "C00")
+        self.assertEqual(obj.get_string_member("I:C").get_string(), "currency.sgs")
+        self.assertEqual(obj.get_string_member("I:D").get_string(), "This is the internal currency of the South Gate Station.")
+
 if __name__ == '__main__':
     unittest.main()

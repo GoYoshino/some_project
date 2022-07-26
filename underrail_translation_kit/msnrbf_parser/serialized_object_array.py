@@ -48,6 +48,9 @@ class LengthPrefixedStringArray(SerializedObjectArray):
     def __init__(self, items: List[LengthPrefixedString]):
         super().__init__(items)
 
+    def get_item(self, index) -> LengthPrefixedString:
+        return self.items[index]
+
     @staticmethod
     def from_stream(stream: BinaryIO, count: int):
         items = []
