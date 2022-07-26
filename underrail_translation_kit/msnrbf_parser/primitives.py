@@ -25,6 +25,12 @@ class RecordHeader(SerializedObject):
         self.record_type = record_type
         super().__init__(raw_bytes)
 
+    @staticmethod
+    def from_stream(stream: BinaryIO):
+        result = stream.read(1)
+        record_type = int.from_bytes(result, "little")
+        return RecordHeader(RecordType(record_type))
+
 class Int8(SerializedObject):
 
     def __init__(self, raw_bytes: bytes):

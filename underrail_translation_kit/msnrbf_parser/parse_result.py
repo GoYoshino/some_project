@@ -30,6 +30,7 @@ class ParseResult(SerializedObjectArray):
         :param new_string: new string
         :param path: path to the binarystring
         """
+        raise Exception("not implemented")
         paths = path.split(".")
         assert len(paths) == 2  # assuming there is no BinaryString directly under root node. may be changed later
 
