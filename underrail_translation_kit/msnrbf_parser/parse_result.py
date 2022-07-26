@@ -31,7 +31,7 @@ class ParseResult(SerializedObjectArray):
         :param path: path to the binarystring
         """
         paths = path.split(".")
-        assert len(paths) == 2  # assuming there is no BinaryString directly under root node. may be changed later
+        assert len(paths) == 2, f"path ({paths}) length is {len(paths)}"  # assuming there is no BinaryString directly under root node. may be changed later
 
         if (self.has_member_class(paths[0])):
             cls = self.get_member_class(paths[0])

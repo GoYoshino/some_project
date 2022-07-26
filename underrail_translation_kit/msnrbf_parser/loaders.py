@@ -21,8 +21,13 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
         new_item = None
         if type == BinaryType.String:
             header = stream.read(1) # increment stream pointer
-            assert header == b"\x06"
-            new_item = BinaryObjectString.from_stream(stream)
+            if header == b"\x06":
+                new_item = BinaryObjectString.from_stream(stream)
+            elif header == b"\x09":
+                new_item = MemberReference.from_stream(stream)
+            else:
+                raise Exception(f"unexpected header: {header}")
+
         elif type == BinaryType.Class:
             header = stream.read(1)  # increment stream pointer
             if header == b"\x01":   # 01_ClassWithID
@@ -31,6 +36,8 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
                 new_item = load_class_with_members_and_types(stream, class_info_dict)
             elif header == b"\x09":
                 new_item = MemberReference.from_stream(stream)
+            elif header == b"\x0A":     # objectnull
+                new_item = ObjectNull()
             else:
                 raise Exception(f"unexpected class header: {header}")
         elif type == BinaryType.Primitive:

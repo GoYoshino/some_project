@@ -2,6 +2,7 @@ from typing import Dict, Tuple
 
 from .binary_object_string import BinaryObjectString
 from .enums import BinaryType
+from .misc_record_classes import MemberReference
 from .primitives import Int8, Int32
 from .record import Record
 from .structure import ClassInfo, MemberTypeInfo
@@ -33,7 +34,7 @@ class ClassWithMembersAndTypes(Record):
             if binary_type != BinaryType.String:
                 continue
             item = self.__values.get_item(i)
-            assert isinstance(item, BinaryObjectString)
+            assert isinstance(item, BinaryObjectString) or isinstance(item, MemberReference), f"not a BinaryString nor MemberReference: {item}"
             dictionary[member_name_list[i]] = item
 
         self.__string_member_dictionary = dictionary
