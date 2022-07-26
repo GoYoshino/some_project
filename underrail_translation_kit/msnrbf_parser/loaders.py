@@ -158,6 +158,8 @@ def load_binary_array(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassIn
             header = RecordHeader.from_stream(stream)
             if header.record_type == RecordType.ClassWithMembersAndTypes:
                 values = load_class_with_members_and_types(stream, class_info_dict)
+            elif header.record_type == RecordType.ClassWithId:
+                values = load_class_with_id(stream, class_info_dict)
             else:
                 raise Exception(f"Not implemented: {header.record_type}")
         else:
