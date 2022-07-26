@@ -10,4 +10,11 @@ def unpack_as_stream(filename: str) -> BinaryIO:
 def unpack(filename: str) -> bytes:
     with open(filename, "rb") as f:
         f.seek(24)
-        return AltGzipFile(fileobj=f, mode="rb").read()
+        gzip_magic = f.read(2)
+        if gzip_magic == b"\x1F\x8B":
+            f.seek(f.tell() - 2)
+            return AltGzipFile(fileobj=f, mode="rb").read()
+        else:
+            print(gzip_magic)
+            f.seek(f.tell() - 2)
+            return f.read()
