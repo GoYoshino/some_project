@@ -5,10 +5,9 @@ from .binary_object_string import BinaryObjectString
 from .class_with_id import ClassWithID
 from .class_with_members_and_types import ClassWithMembersAndTypes
 from .enums import BinaryType, PrimitiveType, BinaryArrayType
-from .misc_record_classes import MemberReference, BinaryArray
+from .misc_record_classes import MemberReference, BinaryArray, ArraySingleString
 from .object_null import ObjectNull
 from .primitives import Int8, Int16, Int32, Double, KnickKnack, NoneObject
-from .serialized_object_array import LengthPrefixedStringArray
 from .structure import ClassInfo, MemberTypeInfo, ClassTypeInfo
 from .value_array import ValueArray
 
@@ -55,7 +54,7 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
             assert header == b"\x0A"
             new_item = ObjectNull()
         elif type == BinaryType.StringArray:
-            new_item = LengthPrefixedStringArray.from_stream()
+            new_item = ArraySingleString
         else:
             raise Exception(f"Not Implemented: {type}")
 

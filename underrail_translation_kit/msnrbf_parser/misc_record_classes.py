@@ -1,9 +1,12 @@
 from io import BytesIO
 from typing import BinaryIO
 
+from .binary_object_string import BinaryObjectString
 from .primitives import Int8, Int32, LengthPrefixedString, KnickKnack
 from .record import Record
 from .serialized_object import SerializedObject
+from .serialized_object_array import SerializedObjectArray
+from .structure import ArrayInfo
 
 class SerializationHeader(Record):
     """
@@ -99,3 +102,25 @@ class BinaryLibrary(Record):
 
     def __repr__(self):
         return "BinaryLibrary"
+
+class ArraySingleString(Record):
+    """
+    Refers to 11(17): ArraySingleString Record
+    """
+    def __init__(self, record_type: Int8, array_info: ArrayInfo, values: SerializedObjectArray):
+        super().__init__(record_type, [array_info, values])
+
+    @staticmethod
+    def from_stream(stream: BinaryIO):
+        record_type = Int8.from_stream(BytesIO(b"\x11"))
+        array_info = ArrayInfo.from_stream(stream)
+        length = array_info.get_length()
+
+        values = []
+        for i in range(length):
+            header = Int8.from_stream(stream)
+            # may come across primitive strings in future?
+            assert header.raw_bytes == b"\x06"
+            values.append(BinaryObjectString.from_stream(stream))
+
+        return ArraySingleString(record_type, array_info, SerializedObjectArray(values))

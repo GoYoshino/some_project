@@ -71,7 +71,7 @@ class AdditionalInfo(SerializedObjectArray):
                 items.append(Int8.from_stream(stream))
             elif binary_type == BinaryType.Class:
                 items.append(ClassTypeInfo.from_stream(stream))
-            elif binary_type == BinaryType.String or binary_type == BinaryType.Object:
+            elif binary_type == BinaryType.String or binary_type == BinaryType.Object or binary_type == BinaryType.StringArray:
                 items.append(NoneObject())
             else:
                 raise Exception(f"Not implemented for {binary_type}")
@@ -111,3 +111,18 @@ class MemberTypeInfo(SerializedObjectArray):
 
     def __repr__(self):
         return f"[MemberTypeInfo BinaryTypeEnums={self.__binary_type_enums} AdditionalInfos={self.__additional_info}]"
+
+class ArrayInfo(SerializedObjectArray):
+
+    def __init__(self, object_id: Int32, length: Int32):
+        super().__init__([object_id, length])
+        self.__length = length
+
+    def get_length(self):
+        return self.__length.value()
+
+    @staticmethod
+    def from_stream(stream: BinaryIO):
+        object_id = Int32.from_stream(stream)
+        length = Int32.from_stream(stream)
+        return ArrayInfo(object_id, length)
