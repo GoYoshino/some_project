@@ -4,10 +4,10 @@ from typing import BinaryIO, Tuple, Dict
 from .binary_object_string import BinaryObjectString
 from .class_with_id import ClassWithID
 from .class_with_members_and_types import ClassWithMembersAndTypes
-from .enums import BinaryType, PrimitiveType, BinaryArrayType
+from .enums import RecordType, BinaryType, PrimitiveType, BinaryArrayType
 from .misc_record_classes import MemberReference, BinaryArray, ArraySingleString
 from .object_null import ObjectNull
-from .primitives import Int8, Int16, Int32, Double, KnickKnack, NoneObject
+from .primitives import RecordHeader, Int8, Int16, Int32, Double, KnickKnack, NoneObject
 from .structure import ClassInfo, MemberTypeInfo, ClassTypeInfo
 from .value_array import ValueArray
 
@@ -77,7 +77,7 @@ def load_class_with_members_and_types(stream: BinaryIO, class_info_dict: Dict[in
         :param stream:
         :return:
     """
-    record_type = Int8.from_stream(BytesIO(b"\x05"))
+    record_type = RecordHeader(RecordType.ClassWithMembersAndTypes)
     class_info = ClassInfo.from_stream(stream)
     object_id = class_info.get_object_id()
     member_type_info = MemberTypeInfo.from_stream(stream, class_info.count())
@@ -90,7 +90,7 @@ def load_class_with_members_and_types(stream: BinaryIO, class_info_dict: Dict[in
     return ClassWithMembersAndTypes(record_type, class_info, member_type_info, library_id, values)
 
 def load_class_with_id(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
-        record_type = Int8.from_stream(BytesIO(b"\x01"))
+        record_type = RecordHeader(RecordType.ClassWithId)
         object_id = Int32.from_stream(stream)
         metadata_id = Int32.from_stream(stream)
 
@@ -99,7 +99,7 @@ def load_class_with_id(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassI
         return ClassWithID(record_type, object_id, metadata_id, values, class_info)
 
 def load_binary_array(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
-        record_type = Int8.from_stream(BytesIO(b"\x07"))
+        record_type = RecordHeader(RecordType.BinaryArray)
         object_id = Int32.from_stream(stream)
         binary_array_type_enum = Int8.from_stream(stream)
         rank = Int32.from_stream(stream)

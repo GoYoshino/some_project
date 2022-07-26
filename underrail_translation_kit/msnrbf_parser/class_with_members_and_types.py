@@ -2,7 +2,7 @@ from typing import Dict, Tuple
 
 from .binary_object_string import BinaryObjectString
 from .enums import BinaryType
-from .primitives import Int8, Int32
+from .primitives import Int32, RecordHeader
 from .record import Record
 from .structure import ClassInfo, MemberTypeInfo
 from .value_array import ValueArray
@@ -12,8 +12,8 @@ class ClassWithMembersAndTypes(Record):
     Refers to 05: ClassWithMembersAndTypes Record
     Does not care detailed behavior as long as the instance preserves original raw byte array
     """
-    def __init__(self, record_type: Int8, class_info: ClassInfo, member_type_info: MemberTypeInfo, library_id: Int32, values: ValueArray):
-        super().__init__(record_type, [class_info, member_type_info, library_id, values])
+    def __init__(self, record_header: RecordHeader, class_info: ClassInfo, member_type_info: MemberTypeInfo, library_id: Int32, values: ValueArray):
+        super().__init__(record_header, [class_info, member_type_info, library_id, values])
 
         self.__class_info = class_info
         self.__member_type_info = member_type_info

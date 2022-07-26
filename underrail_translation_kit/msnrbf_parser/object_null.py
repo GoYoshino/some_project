@@ -1,6 +1,7 @@
 from io import BytesIO
 
-from .primitives import Int8
+from .enums import RecordType
+from .primitives import RecordHeader
 from .record import Record
 
 class ObjectNull(Record):
@@ -9,5 +10,5 @@ class ObjectNull(Record):
     """
 
     def __init__(self):
-        record_type = Int8.from_stream(BytesIO(b"\x0A"))
+        record_type = RecordHeader(RecordType.ObjectNull)
         super().__init__(record_type, [])

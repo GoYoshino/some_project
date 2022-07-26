@@ -1,8 +1,9 @@
 from io import BytesIO
 from typing import BinaryIO
 
+from .enums import RecordType
 from .record import Record
-from .primitives import LengthPrefixedString, Int8, Int32
+from .primitives import LengthPrefixedString, Int8, Int32, RecordHeader
 
 class BinaryObjectString(Record):
     """
@@ -10,8 +11,8 @@ class BinaryObjectString(Record):
     *Does* care detailed behavior because it is relevant to translation work
     """
 
-    def __init__(self, record_type: Int8, object_id: Int32, value: LengthPrefixedString):
-        super().__init__(record_type, [object_id, value])
+    def __init__(self, record_header: RecordHeader, object_id: Int32, value: LengthPrefixedString):
+        super().__init__(record_header, [object_id, value])
         self.__object_id = object_id
         self.__value = value
 
@@ -33,7 +34,7 @@ class BinaryObjectString(Record):
             :param record_type:
             :return:
         """
-        record_type = Int8.from_stream(BytesIO(b"\x06"))
+        record_type = RecordHeader(RecordType.BinaryObjectString)
         object_id = Int32.from_stream(stream)
         value = LengthPrefixedString.from_stream(stream)
         return BinaryObjectString(record_type, object_id, value)
