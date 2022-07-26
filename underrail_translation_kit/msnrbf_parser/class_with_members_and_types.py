@@ -10,7 +10,7 @@ from .value_array import ValueArray
 class ClassWithMembersAndTypes(Record):
     """
     Refers to 05: ClassWithMembersAndTypes Record
-    Does not care detailed behavior as long as the instance preserves original raw byte array
+    *Does* care detailed behavior because it is related to translation work
     """
     def __init__(self, record_header: RecordHeader, class_info: ClassInfo, member_type_info: MemberTypeInfo, library_id: Int32, values: ValueArray):
         super().__init__(record_header, [class_info, member_type_info, library_id, values])
