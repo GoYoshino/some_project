@@ -148,6 +148,8 @@ def load_binary_array(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassIn
 
         binary_type = BinaryType(type_enum.value())
 
+        ### AdditionalInfo ###
+        additional_type_info = None
         # we do not implement for now
         #if binary_type == BinaryType.Object or binary_type == BinaryType.String or binary_type == BinaryType.ObjectArray or binary_type == BinaryType.StringArray:
         #    additional_type_info = NoneObject()
@@ -155,14 +157,23 @@ def load_binary_array(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassIn
         #    additional_type_info = KnickKnack.from_stream(stream, rank.value()*1)
         if binary_type == BinaryType.Class:
             additional_type_info = ClassTypeInfo.from_stream(stream)
-            header = RecordHeader.from_stream(stream)
-            if header.record_type == RecordType.ClassWithMembersAndTypes:
-                values = load_class_with_members_and_types(stream, class_info_dict)
-            elif header.record_type == RecordType.ClassWithId:
-                values = load_class_with_id(stream, class_info_dict)
-            else:
-                raise Exception(f"Not implemented: {header.record_type}")
         else:
-            raise Exception(f"Not implemented: {binary_type}")
+            Exception(f"Not implemented: {binary_type}")
+
+        ### Values ###
+        # NO values for 0-rank arrays / 0-length arrays
+        if rank.value() == 0 or (rank.value() == 1 and int.from_bytes(lengths.raw_bytes, "little") == 0):
+            values = NoneObject()
+            return BinaryArray(record_type, object_id, binary_array_type_enum, rank, lengths, lower_bounds, type_enum, additional_type_info, values)
+
+        header = RecordHeader.from_stream(stream)
+        if header.record_type == RecordType.ClassWithMembersAndTypes:
+            values = load_class_with_members_and_types(stream, class_info_dict)
+        elif header.record_type == RecordType.ClassWithId:
+            values = load_class_with_id(stream, class_info_dict)
+        else:
+            print(record_type.raw_bytes + object_id. raw_bytes + binary_array_type_enum.raw_bytes + rank.raw_bytes + lengths.raw_bytes)
+            raise Exception(f"Not implemented: {header.record_type}")
+
 
         return BinaryArray(record_type, object_id, binary_array_type_enum, rank, lengths, lower_bounds, type_enum, additional_type_info, values)
