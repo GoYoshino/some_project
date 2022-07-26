@@ -8,6 +8,7 @@ from .enums import BinaryType, PrimitiveType, BinaryArrayType
 from .misc_record_classes import MemberReference, BinaryArray
 from .object_null import ObjectNull
 from .primitives import Int8, Int16, Int32, Double, KnickKnack, NoneObject
+from .serialized_object_array import LengthPrefixedStringArray
 from .structure import ClassInfo, MemberTypeInfo, ClassTypeInfo
 from .value_array import ValueArray
 
@@ -53,6 +54,8 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
             header = stream.read(1)  # increment stream pointer
             assert header == b"\x0A"
             new_item = ObjectNull()
+        elif type == BinaryType.StringArray:
+            new_item = LengthPrefixedStringArray.from_stream()
         else:
             raise Exception(f"Not Implemented: {type}")
 
@@ -101,12 +104,8 @@ def load_binary_array(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassIn
             lower_bounds = KnickKnack.from_stream(stream, rank.value()*4)
         else:
             lower_bounds = NoneObject()
-        print(lengths)
-        print(lower_bounds)
-        print(binary_array_type_enum)
 
         type_enum = Int8.from_stream(stream)
-        print(type_enum)
 
         binary_type = BinaryType(type_enum.value())
 
