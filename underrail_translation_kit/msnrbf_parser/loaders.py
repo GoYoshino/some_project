@@ -1,14 +1,14 @@
 from io import BytesIO
 from typing import BinaryIO, List
 
-from .class_with_members_and_types import ClassWithMembersAndTypes
-from .primitives import Int8, Int16, Int32, Double
-from .enums import BinaryType, PrimitiveType
-from .value_array import ValueArray
-from .misc_record_classes import MemberReference
-from .structure import ClassInfo, MemberTypeInfo
-from .object_null import ObjectNull
 from .binary_object_string import BinaryObjectString
+from .class_with_members_and_types import ClassWithMembersAndTypes
+from .enums import BinaryType, PrimitiveType
+from .misc_record_classes import MemberReference
+from .object_null import ObjectNull
+from .primitives import Int8, Int16, Int32, Double
+from .structure import ClassInfo, MemberTypeInfo
+from .value_array import ValueArray
 
 def load_values(stream: BinaryIO, type_list: List[BinaryType], primitive_type_list: List[PrimitiveType]) -> ValueArray:
     items = []

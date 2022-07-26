@@ -1,6 +1,6 @@
+from .primitives import Int8, Int32
 from .record import Record
 from .structure import ClassInfo, MemberTypeInfo
-from .primitives import Int8, Int32
 from .value_array import ValueArray
 
 class ClassWithMembersAndTypes(Record):
