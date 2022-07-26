@@ -103,17 +103,18 @@ class KnickKnack(SerializedObject):
     Who cares detailed internal of it as long as it preserves original raw bytes
     """
 
-    def __init__(self, raw_bytes: bytes, size: int):
+    def __init__(self, raw_bytes: bytes, size: int, name: str="knicknack"):
         super().__init__(raw_bytes)
         self.__size = size
+        self.__name = name
 
     @staticmethod
-    def from_stream(stream: BinaryIO, size: int):
+    def from_stream(stream: BinaryIO, size: int, name: str="knicknack"):
         raw_bytes = stream.read(size)
-        return KnickKnack(raw_bytes, size)
+        return KnickKnack(raw_bytes, size, name)
 
     def __repr__(self):
-        return f"({self.raw_bytes})"
+        return f"{self.__name}({self.raw_bytes})"
 
 class LengthPrefixedString(SerializedObject):
 

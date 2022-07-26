@@ -44,7 +44,7 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
         elif type == BinaryType.Primitive:
             prim_type = primitive_type_list[i]
             if prim_type == PrimitiveType.Boolean:
-                new_item = KnickKnack.from_stream(stream, 1)
+                new_item = KnickKnack.from_stream(stream, 1, "Boolean")
             elif prim_type == PrimitiveType.Byte:
                 new_item = Int8.from_stream(stream)
             elif prim_type == PrimitiveType.Int16:
@@ -52,13 +52,15 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
             elif prim_type == PrimitiveType.Int32:
                 new_item = Int32.from_stream(stream)
             elif prim_type == PrimitiveType.Int64:
-                new_item = KnickKnack.from_stream(stream, 8)
+                new_item = KnickKnack.from_stream(stream, 8, "Int64")
             elif prim_type == PrimitiveType.Double:
                 new_item = Double.from_stream(stream)
             elif prim_type == PrimitiveType.Single:
-                new_item = KnickKnack.from_stream(stream, 4)
+                new_item = KnickKnack.from_stream(stream, 4, "Single")
             elif prim_type == PrimitiveType.UInt32:
-                new_item = KnickKnack.from_stream(stream, 4)
+                new_item = KnickKnack.from_stream(stream, 4, "UInt32")
+            elif prim_type == PrimitiveType.TimeSpan:
+                new_item = KnickKnack.from_stream(stream, 8, "TimeSpan")
             else:
                 raise Exception(f"Not Implemented: {prim_type}")
         elif type == BinaryType.Object:
@@ -153,12 +155,11 @@ def load_binary_array(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassIn
         #    additional_type_info = KnickKnack.from_stream(stream, rank.value()*1)
         if binary_type == BinaryType.Class:
             additional_type_info = ClassTypeInfo.from_stream(stream)
-            # TODO: header check code is duplicated. can be externalized later
-            header = Int8.from_stream(stream)
-            if header.raw_bytes == b"\x05":
+            header = RecordHeader.from_stream(stream)
+            if header.record_type == RecordType.ClassWithMembersAndTypes:
                 values = load_class_with_members_and_types(stream, class_info_dict)
             else:
-                raise Exception(f"Not implemented: {header}")
+                raise Exception(f"Not implemented: {header.record_type}")
         else:
             raise Exception(f"Not implemented: {binary_type}")
 
