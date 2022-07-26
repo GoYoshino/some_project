@@ -46,3 +46,11 @@ class PrimitiveType(Enum):
     Int16 = 7
     Int32 = 8
     Single = 11
+
+class BinaryArrayType(Enum):
+    Single = 0
+    Jagged = 1
+    Rectangular = 2
+    SingleOffset = 3
+    JaggedOffset = 4
+    RectangularOffset = 5

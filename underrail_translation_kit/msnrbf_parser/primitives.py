@@ -96,7 +96,7 @@ class KnickKnack(SerializedObject):
         return KnickKnack(raw_bytes, size)
 
     def __repr__(self):
-        return f"KnickKnack({self.__size})"
+        return f"({self.raw_bytes})"
 
 class LengthPrefixedString(SerializedObject):
 

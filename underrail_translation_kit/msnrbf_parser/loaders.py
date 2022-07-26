@@ -4,11 +4,11 @@ from typing import BinaryIO, Tuple, Dict
 from .binary_object_string import BinaryObjectString
 from .class_with_id import ClassWithID
 from .class_with_members_and_types import ClassWithMembersAndTypes
-from .enums import BinaryType, PrimitiveType
-from .misc_record_classes import MemberReference
+from .enums import BinaryType, PrimitiveType, BinaryArrayType
+from .misc_record_classes import MemberReference, BinaryArray
 from .object_null import ObjectNull
-from .primitives import Int8, Int16, Int32, Double, KnickKnack
-from .structure import ClassInfo, MemberTypeInfo
+from .primitives import Int8, Int16, Int32, Double, KnickKnack, NoneObject
+from .structure import ClassInfo, MemberTypeInfo, ClassTypeInfo
 from .value_array import ValueArray
 
 def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ValueArray:
@@ -84,3 +84,44 @@ def load_class_with_id(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassI
         class_info = class_info_dict[metadata_id.value()]
         values = load_values(stream, class_info, class_info_dict)
         return ClassWithID(record_type, object_id, metadata_id, values, class_info)
+
+def load_binary_array(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
+        record_type = Int8.from_stream(BytesIO(b"\x07"))
+        object_id = Int32.from_stream(stream)
+        binary_array_type_enum = Int8.from_stream(stream)
+        rank = Int32.from_stream(stream)
+        lengths = KnickKnack.from_stream(stream, rank.value()*4)
+
+        array_type = BinaryArrayType(binary_array_type_enum.value())
+        if (array_type == BinaryArrayType.SingleOffset
+            or array_type == BinaryArrayType.JaggedOffset
+            or array_type == BinaryArrayType.RectangularOffset):
+            lower_bounds = KnickKnack.from_stream(stream, rank.value()*4)
+        else:
+            lower_bounds = NoneObject()
+        print(lengths)
+        print(lower_bounds)
+        print(binary_array_type_enum)
+
+        type_enum = Int8.from_stream(stream)
+        print(type_enum)
+
+        binary_type = BinaryType(type_enum.value())
+
+        # we do not implement for now
+        #if binary_type == BinaryType.Object or binary_type == BinaryType.String or binary_type == BinaryType.ObjectArray or binary_type == BinaryType.StringArray:
+        #    additional_type_info = NoneObject()
+        #elif binary_type == BinaryType.Primitive:
+        #    additional_type_info = KnickKnack.from_stream(stream, rank.value()*1)
+        if binary_type == BinaryType.Class:
+            additional_type_info = ClassTypeInfo.from_stream(stream)
+            # TODO: header check code is duplicated. can be externalized later
+            header = Int8.from_stream(stream)
+            if header.raw_bytes == b"\x05":
+                values = load_class_with_members_and_types(stream, class_info_dict)
+            else:
+                raise Exception(f"Not implemented: {header}")
+        else:
+            raise Exception(f"Not implemented: {binary_type}")
+
+        return BinaryArray(record_type, object_id, binary_array_type_enum, rank, lengths, lower_bounds, type_enum, additional_type_info, values)
