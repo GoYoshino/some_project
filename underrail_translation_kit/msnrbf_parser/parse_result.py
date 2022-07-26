@@ -39,6 +39,13 @@ class ParseResult(SerializedObjectArray):
 
         self.recalc_raw_bytes()
 
+    def get_text(self, path: str) -> str:
+        paths = path.split(".")
+        assert len(paths) == 2
+
+        if self.has_member_class(paths[0]):
+            return self.get_member_class(paths[0]).get_text(paths[1])
+
     def has_member_class(self, name: str) -> bool:
         return name in self.__dictionary.keys()
 

@@ -17,6 +17,9 @@ class ReadWholeFileTest(unittest.TestCase):
             self.assertTrue(C00.has_string_member("I:D"))
             self.assertEqual(C00.get_string_member("I:D").get_string(), "This is the internal currency of the South Gate Station.")
 
+            self.assertEqual(result.get_text("C00.I:C"), "currency.sgs")
+            self.assertEqual(result.get_text("C00.I:D"), "This is the internal currency of the South Gate Station.")
+
     def test_read_item_file2(self):
         with open("msnrbf_parser/data/stygiancoin", "rb") as f:
             result = parse_binary_stream(f)
