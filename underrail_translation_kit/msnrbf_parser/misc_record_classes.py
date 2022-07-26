@@ -120,7 +120,7 @@ class ArraySingleString(Record):
         for i in range(length):
             header = Int8.from_stream(stream)
             # may come across primitive strings in future?
-            assert header.raw_bytes == b"\x06"
+            assert header.raw_bytes == b"\x06", f"Unexpected header: {header}"
             values.append(BinaryObjectString.from_stream(stream))
 
         return ArraySingleString(record_type, array_info, SerializedObjectArray(values))

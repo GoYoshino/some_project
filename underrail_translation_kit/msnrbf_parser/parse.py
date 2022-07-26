@@ -2,7 +2,7 @@ from typing import BinaryIO
 
 from .binary_object_string import BinaryObjectString
 from .loaders import load_class_with_members_and_types, load_class_with_id, load_binary_array
-from .misc_record_classes import SerializationHeader, BinaryLibrary, MessageEnd
+from .misc_record_classes import SerializationHeader, BinaryLibrary, MessageEnd, ArraySingleString
 from .parse_result import ParseResult
 from .record import RecordType
 
@@ -29,6 +29,8 @@ def parse_binary_stream(stream: BinaryIO) -> ParseResult:
             new_item = load_binary_array(stream, class_info_dict)
         elif record_type == RecordType.BinaryLibrary:
             new_item = BinaryLibrary.from_stream(stream)
+        elif record_type == RecordType.ArraySingleString:
+            new_item = ArraySingleString.from_stream(stream)
         elif record_type == RecordType.MessageEnd:
             result.append(MessageEnd())
             break

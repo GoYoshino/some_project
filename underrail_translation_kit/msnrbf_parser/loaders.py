@@ -54,7 +54,14 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
             assert header == b"\x0A"
             new_item = ObjectNull()
         elif type == BinaryType.StringArray:
-            new_item = ArraySingleString
+            header = stream.read(1)
+            if header == b"\x11":
+                # TODO: duplication!
+                new_item = ArraySingleString.from_stream(stream)
+            elif header == b"\x09":
+                new_item = MemberReference.from_stream(stream)
+            else:
+                raise Exception(f"unexpected header: {header}")
         else:
             raise Exception(f"Not Implemented: {type}")
 
