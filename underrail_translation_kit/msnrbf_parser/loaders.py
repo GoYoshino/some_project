@@ -1,5 +1,6 @@
 from typing import BinaryIO, Tuple, Dict
 
+from underrail_translation_kit.msnrbf_parser.serialized_object_array import SerializedObjectArray
 from .enums import RecordType, BinaryType, PrimitiveType, BinaryArrayType
 from .binary_object_string import BinaryObjectString
 from .class_with_id import ClassWithID
@@ -23,12 +24,12 @@ def _load_string_value(stream: BinaryIO) -> SerializedObject:
         raise Exception(f"unexpected header: {header}")
 
 
-def _load_class_value(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
+def _load_class_value(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
     header = RecordHeader.from_stream(stream)
     if header.record_type == RecordType.ClassWithId:
-        return load_class_with_id(stream, class_info_dict)
+        return load_class_with_id(stream, class_info_appeared_so_far)
     elif header.record_type == RecordType.ClassWithMembersAndTypes:
-        return load_class_with_members_and_types(stream, class_info_dict)
+        return load_class_with_members_and_types(stream, class_info_appeared_so_far)
     elif header.record_type == RecordType.MemberReference:
         return MemberReference.from_stream(stream)
     elif header.record_type == RecordType.ObjectNull:
@@ -155,13 +156,13 @@ def load_class_with_id(stream: BinaryIO, class_info_appeared_so_far: Dict[int, T
     return ClassWithID(record_type, object_id, metadata_id, values, class_info)
 
 
-def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
+def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> BinaryArray:
     """
     注: かなり雑な実装で、arrayの長さを1と仮定している。こんな実装でよく動いたな？
     バイナリに2以上の長さのものが出てきたら再実装の必要あり
     :param stream: *必ずヘッダを含まない開始地点であること*
-    :param class_info_appeared_so_far: 
-    :return: 
+    :param class_info_appeared_so_far: 今までに出現したクラス情報。このメソッド中で更新されることもある。
+    :return: BinaryArray
     """
     
     record_type = RecordHeader(RecordType.BinaryArray)
@@ -202,15 +203,17 @@ def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tu
         values = NoneObject()
         return BinaryArray(record_type, object_id, binary_array_type_enum, rank, lengths, lower_bounds, type_enum, additional_type_info, values)
 
-    assert rank.value() == 1 and int.from_bytes(lengths.raw_bytes, "little") == 1, f"Not implemented: rank={rank.value()}, lengths={lengths}"
+    assert rank.value() == 1, f"Not implemented for rank > 2 (now {rank.value()})"
+    assert len(lengths.raw_bytes) == 4
+    length = int.from_bytes(lengths.raw_bytes, "little")
 
-    header = RecordHeader.from_stream(stream)
-    if header.record_type == RecordType.ClassWithMembersAndTypes:
-        values = load_class_with_members_and_types(stream, class_info_appeared_so_far)
-    elif header.record_type == RecordType.ClassWithId:
-        values = load_class_with_id(stream, class_info_appeared_so_far)
-    else:
-        print(record_type.raw_bytes + object_id.raw_bytes + binary_array_type_enum.raw_bytes + rank.raw_bytes + lengths.raw_bytes)
-        raise Exception(f"Not implemented: {header.record_type}")
+    value_list = []
+    for i in range(length):
+        if binary_type == BinaryType.Class:
+            value_list.append(_load_class_value(stream, class_info_appeared_so_far))
+        else:
+            raise Exception(f"not implemented: {binary_type}")
+
+    values = SerializedObjectArray(value_list)
 
     return BinaryArray(record_type, object_id, binary_array_type_enum, rank, lengths, lower_bounds, type_enum, additional_type_info, values)

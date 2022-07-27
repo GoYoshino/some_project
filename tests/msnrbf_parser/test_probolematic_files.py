@@ -50,5 +50,8 @@ class ProbolematicFilesTest(unittest.TestCase):
     def test_read_cc_forgerpretguard_udlg(self):
         self.do_test_at_file("msnrbf_parser/data/problematic/cc_forgerpretguard.udlg")
 
+    def test_read_sniper_frame(self):
+        self.do_test_at_file("msnrbf_parser/data/problematic/sniperframe1.item")
+
 if __name__ == '__main__':
     unittest.main()

@@ -34,5 +34,20 @@ class BinaryArrayLoaderTest(unittest.TestCase):
         assertEqualToStream(self, result.raw_bytes, stream)
 
 
+    def test_for_a_case_problematic(self):
+        input = b"\x07\x1C\x00\x00\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\x04\x03"
+        input += b"\x65\x42\x54\x02\x00\x00\x00\x05\xE3\xFF\xFF\xFF\x03\x65\x42\x54"
+        input += b"\x01\x00\x00\x00\x07\x76\x61\x6C\x75\x65\x5F\x5F\x00\x08\x02\x00"
+        input += b"\x00\x00\x01\x00\x00\x00\x01\xE2\xFF\xFF\xFF\xE3\xFF\xFF\xFF\x04"
+        input += b"\x00\x00\x00\x01\xE1\xFF\xFF\xFF\xE3\xFF\xFF\xFF\x05\x00\x00\x00"
+        input += b"\x01\xE0\xFF\xFF\xFF\xE3\xFF\xFF\xFF\x00\x00\x00\x00"
+
+        stream = BytesIO(input)
+        stream.seek(1)
+        result = load_binary_array(stream, {})
+        assertEndOfStream(self, stream)
+        assertEqualToStream(self, result.raw_bytes, stream)
+
+
 if __name__ == '__main__':
     unittest.main()

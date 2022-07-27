@@ -3,7 +3,7 @@
 単体テストのように常に走らせる類のものではないことに注意
 """
 
-import sys
+import traceback
 import tqdm
 
 from underrail_translation_kit.msnrbf_parser import parse_binary_stream
@@ -34,6 +34,6 @@ if __name__ == "__main__":
                     corrupt_count += 1
             except Exception:
                 print(f"Exception at {file}")
-                print(sys.exc_info()[2])
+                print(traceback.format_exc())
 
     print(f"done. {corrupt_count} files are corrupted.")
