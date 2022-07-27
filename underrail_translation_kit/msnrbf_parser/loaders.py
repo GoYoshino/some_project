@@ -146,59 +146,69 @@ def load_class_with_members_and_types(stream: BinaryIO, class_info_appeared_so_f
 
 
 def load_class_with_id(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
-        record_type = RecordHeader(RecordType.ClassWithId)
-        object_id = Int32.from_stream(stream)
-        metadata_id = Int32.from_stream(stream)
+    record_type = RecordHeader(RecordType.ClassWithId)
+    object_id = Int32.from_stream(stream)
+    metadata_id = Int32.from_stream(stream)
 
-        class_info = class_info_appeared_so_far[metadata_id.value()]
-        values = load_values(stream, class_info, class_info_appeared_so_far)
-        return ClassWithID(record_type, object_id, metadata_id, values, class_info)
+    class_info = class_info_appeared_so_far[metadata_id.value()]
+    values = load_values(stream, class_info, class_info_appeared_so_far)
+    return ClassWithID(record_type, object_id, metadata_id, values, class_info)
 
 
 def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
-        record_type = RecordHeader(RecordType.BinaryArray)
-        object_id = Int32.from_stream(stream)
-        binary_array_type_enum = Int8.from_stream(stream)
-        rank = Int32.from_stream(stream)
-        lengths = KnickKnack.from_stream(stream, rank.value()*4)
+    """
+    注: かなり雑な実装で、arrayの長さを1と仮定している。こんな実装でよく動いたな？
+    バイナリに2以上の長さのものが出てきたら再実装の必要あり
+    :param stream: 
+    :param class_info_appeared_so_far: 
+    :return: 
+    """
+    
+    record_type = RecordHeader(RecordType.BinaryArray)
+    object_id = Int32.from_stream(stream)
+    binary_array_type_enum = Int8.from_stream(stream)
+    rank = Int32.from_stream(stream)
+    lengths = KnickKnack.from_stream(stream, rank.value()*4)
 
-        array_type = BinaryArrayType(binary_array_type_enum.value())
-        if (array_type == BinaryArrayType.SingleOffset
-            or array_type == BinaryArrayType.JaggedOffset
-            or array_type == BinaryArrayType.RectangularOffset):
-            lower_bounds = KnickKnack.from_stream(stream, rank.value()*4)
-        else:
-            lower_bounds = NoneObject()
+    array_type = BinaryArrayType(binary_array_type_enum.value())
+    if (array_type == BinaryArrayType.SingleOffset
+        or array_type == BinaryArrayType.JaggedOffset
+        or array_type == BinaryArrayType.RectangularOffset):
+        lower_bounds = KnickKnack.from_stream(stream, rank.value()*4)
+    else:
+        lower_bounds = NoneObject()
 
-        type_enum = Int8.from_stream(stream)
+    type_enum = Int8.from_stream(stream)
 
-        binary_type = BinaryType(type_enum.value())
+    binary_type = BinaryType(type_enum.value())
 
-        ### AdditionalInfo ###
-        additional_type_info = None
-        # we do not implement for now
-        #if binary_type == BinaryType.Object or binary_type == BinaryType.String or binary_type == BinaryType.ObjectArray or binary_type == BinaryType.StringArray:
-        #    additional_type_info = NoneObject()
-        #elif binary_type == BinaryType.Primitive:
-        #    additional_type_info = KnickKnack.from_stream(stream, rank.value()*1)
-        if binary_type == BinaryType.Class:
-            additional_type_info = ClassTypeInfo.from_stream(stream)
-        else:
-            Exception(f"Not implemented: {binary_type}")
+    ### AdditionalInfo ###
+    additional_type_info = None
+    # we do not implement for now
+    #if binary_type == BinaryType.Object or binary_type == BinaryType.String or binary_type == BinaryType.ObjectArray or binary_type == BinaryType.StringArray:
+    #    additional_type_info = NoneObject()
+    #elif binary_type == BinaryType.Primitive:
+    #    additional_type_info = KnickKnack.from_stream(stream, rank.value()*1)
+    if binary_type == BinaryType.Class:
+        additional_type_info = ClassTypeInfo.from_stream(stream)
+    else:
+        Exception(f"Not implemented: {binary_type}")
 
-        ### Values ###
-        # NO values for 0-rank arrays / 0-length arrays
-        if rank.value() == 0 or (rank.value() == 1 and int.from_bytes(lengths.raw_bytes, "little") == 0):
-            values = NoneObject()
-            return BinaryArray(record_type, object_id, binary_array_type_enum, rank, lengths, lower_bounds, type_enum, additional_type_info, values)
-
-        header = RecordHeader.from_stream(stream)
-        if header.record_type == RecordType.ClassWithMembersAndTypes:
-            values = load_class_with_members_and_types(stream, class_info_appeared_so_far)
-        elif header.record_type == RecordType.ClassWithId:
-            values = load_class_with_id(stream, class_info_appeared_so_far)
-        else:
-            print(record_type.raw_bytes + object_id. raw_bytes + binary_array_type_enum.raw_bytes + rank.raw_bytes + lengths.raw_bytes)
-            raise Exception(f"Not implemented: {header.record_type}")
-
+    ### Values ###
+    # NO values for 0-rank arrays / 0-length arrays
+    if rank.value() == 0 or (rank.value() == 1 and int.from_bytes(lengths.raw_bytes, "little") == 0):
+        values = NoneObject()
         return BinaryArray(record_type, object_id, binary_array_type_enum, rank, lengths, lower_bounds, type_enum, additional_type_info, values)
+
+    assert rank.value() == 1 and int.from_bytes(lengths.raw_bytes, "little") == 1, f"Not implemented: rank={rank.value()}, lengths={lengths}"
+
+    header = RecordHeader.from_stream(stream)
+    if header.record_type == RecordType.ClassWithMembersAndTypes:
+        values = load_class_with_members_and_types(stream, class_info_appeared_so_far)
+    elif header.record_type == RecordType.ClassWithId:
+        values = load_class_with_id(stream, class_info_appeared_so_far)
+    else:
+        print(record_type.raw_bytes + object_id. raw_bytes + binary_array_type_enum.raw_bytes + rank.raw_bytes + lengths.raw_bytes)
+        raise Exception(f"Not implemented: {header.record_type}")
+
+    return BinaryArray(record_type, object_id, binary_array_type_enum, rank, lengths, lower_bounds, type_enum, additional_type_info, values)
