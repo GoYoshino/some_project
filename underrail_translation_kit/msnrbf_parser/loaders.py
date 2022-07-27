@@ -11,6 +11,15 @@ from .primitives import RecordHeader, Int8, Int16, Int32, Double, KnickKnack, No
 from .structure import ClassInfo, MemberTypeInfo, ClassTypeInfo
 from .value_array import ValueArray
 
+def __load_string_value(stream: BinaryIO):
+    header = stream.read(1)  # increment stream pointer
+    if header == b"\x06":
+        return BinaryObjectString.from_stream(stream)
+    elif header == b"\x09":
+        return MemberReference.from_stream(stream)
+    else:
+        raise Exception(f"unexpected header: {header}")
+
 def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ValueArray:
     items = []
 
@@ -20,13 +29,7 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
     for i, type in enumerate(type_list):
         new_item = None
         if type == BinaryType.String:
-            header = stream.read(1) # increment stream pointer
-            if header == b"\x06":
-                new_item = BinaryObjectString.from_stream(stream)
-            elif header == b"\x09":
-                new_item = MemberReference.from_stream(stream)
-            else:
-                raise Exception(f"unexpected header: {header}")
+            new_item = __load_string_value(stream)
 
         elif type == BinaryType.Class:
             header = stream.read(1)  # increment stream pointer
