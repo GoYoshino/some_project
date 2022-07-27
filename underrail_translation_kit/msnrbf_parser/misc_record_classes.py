@@ -1,4 +1,3 @@
-from io import BytesIO
 from typing import BinaryIO
 
 from .binary_object_string import BinaryObjectString

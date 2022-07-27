@@ -1,5 +1,3 @@
-from io import BytesIO
-
 from .enums import RecordType
 from .primitives import RecordHeader
 from .record import Record

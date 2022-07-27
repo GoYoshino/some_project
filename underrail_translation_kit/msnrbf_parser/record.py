@@ -1,6 +1,5 @@
 from typing import List
 
-from .enums import RecordType
 from .primitives import RecordHeader
 from .serialized_object import SerializedObject
 from .serialized_object_array import SerializedObjectArray

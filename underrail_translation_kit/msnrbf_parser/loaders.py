@@ -1,4 +1,3 @@
-from io import BytesIO
 from typing import BinaryIO, Tuple, Dict
 
 from .enums import RecordType, BinaryType, PrimitiveType, BinaryArrayType
