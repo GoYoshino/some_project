@@ -77,10 +77,10 @@ def _load_string_array_value(stream: BinaryIO) -> SerializedObject:
 
 
 def _load_system_class_value(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
-    header = stream.read(1)
-    if header == b"\x04":
+    header = RecordHeader.from_stream(stream)
+    if header.record_type == RecordType.SystemClassWithMembersAndTypes:
         return load_system_class_with_members_and_types(stream, class_info_appeared_so_far)
-    elif header == b"\x09":
+    elif header.record_type == RecordType.MemberReference:
         return MemberReference.from_stream(stream)
     else:
         raise Exception(f"unexpected header: {header}")
