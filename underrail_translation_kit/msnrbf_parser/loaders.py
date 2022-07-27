@@ -70,16 +70,16 @@ def __load_string_array_value(stream: BinaryIO) -> SerializedObject:
     else:
         raise Exception(f"unexpected header: {header}")
 
-def __load_system_class_value(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
+def __load_system_class_value(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
     header = stream.read(1)
     if header == b"\x04":
-        return load_system_class_with_members_and_types(stream, class_info_dict)
+        return load_system_class_with_members_and_types(stream, class_info_appeared_so_far)
     elif header == b"\x09":
         return MemberReference.from_stream(stream)
     else:
         raise Exception(f"unexpected header: {header}")
 
-def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ValueArray:
+def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ValueArray:
     items = []
 
     type_list = class_info[1].get_binary_type_list()
@@ -90,9 +90,9 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
         if type == BinaryType.String:
             new_item = __load_string_value(stream)
         elif type == BinaryType.SystemClass:
-            new_item = __load_system_class_value(stream, class_info_dict)
+            new_item = __load_system_class_value(stream, class_info_appeared_so_far)
         elif type == BinaryType.Class:
-            new_item = __load_class_value(stream, class_info_dict)
+            new_item = __load_class_value(stream, class_info_appeared_so_far)
         elif type == BinaryType.Primitive:
             new_item = __load_primitive_value(stream, primitive_type_list[i])
         elif type == BinaryType.Object:
@@ -106,7 +106,7 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
 
     return ValueArray(items)
 
-def load_system_class_with_members_and_types(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SystemClassWithMembersAndTypes:
+def load_system_class_with_members_and_types(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SystemClassWithMembersAndTypes:
     """
         Be sure that the pointer of stream is +1(after first byte of RecordTypeEnum)
     """
@@ -115,36 +115,36 @@ def load_system_class_with_members_and_types(stream: BinaryIO, class_info_dict: 
     object_id = class_info.get_object_id()
     member_type_info = MemberTypeInfo.from_stream(stream, class_info.count())
 
-    class_info_dict[object_id] = (class_info, member_type_info)
+    class_info_appeared_so_far[object_id] = (class_info, member_type_info)
 
-    values = load_values(stream, (class_info, member_type_info), class_info_dict)
+    values = load_values(stream, (class_info, member_type_info), class_info_appeared_so_far)
 
     return SystemClassWithMembersAndTypes(record_type, class_info, member_type_info, values)
 
-def load_class_with_members_and_types(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ClassWithMembersAndTypes:
+def load_class_with_members_and_types(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ClassWithMembersAndTypes:
 
     record_type = RecordHeader(RecordType.ClassWithMembersAndTypes)
     class_info = ClassInfo.from_stream(stream)
     object_id = class_info.get_object_id()
     member_type_info = MemberTypeInfo.from_stream(stream, class_info.count())
 
-    class_info_dict[object_id] = (class_info, member_type_info)
+    class_info_appeared_so_far[object_id] = (class_info, member_type_info)
 
     library_id = Int32.from_stream(stream)
-    values = load_values(stream, (class_info, member_type_info), class_info_dict)
+    values = load_values(stream, (class_info, member_type_info), class_info_appeared_so_far)
 
     return ClassWithMembersAndTypes(record_type, class_info, member_type_info, library_id, values)
 
-def load_class_with_id(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
+def load_class_with_id(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
         record_type = RecordHeader(RecordType.ClassWithId)
         object_id = Int32.from_stream(stream)
         metadata_id = Int32.from_stream(stream)
 
-        class_info = class_info_dict[metadata_id.value()]
-        values = load_values(stream, class_info, class_info_dict)
+        class_info = class_info_appeared_so_far[metadata_id.value()]
+        values = load_values(stream, class_info, class_info_appeared_so_far)
         return ClassWithID(record_type, object_id, metadata_id, values, class_info)
 
-def load_binary_array(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
+def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
         record_type = RecordHeader(RecordType.BinaryArray)
         object_id = Int32.from_stream(stream)
         binary_array_type_enum = Int8.from_stream(stream)
@@ -183,9 +183,9 @@ def load_binary_array(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassIn
 
         header = RecordHeader.from_stream(stream)
         if header.record_type == RecordType.ClassWithMembersAndTypes:
-            values = load_class_with_members_and_types(stream, class_info_dict)
+            values = load_class_with_members_and_types(stream, class_info_appeared_so_far)
         elif header.record_type == RecordType.ClassWithId:
-            values = load_class_with_id(stream, class_info_dict)
+            values = load_class_with_id(stream, class_info_appeared_so_far)
         else:
             print(record_type.raw_bytes + object_id. raw_bytes + binary_array_type_enum.raw_bytes + rank.raw_bytes + lengths.raw_bytes)
             raise Exception(f"Not implemented: {header.record_type}")
