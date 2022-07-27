@@ -43,8 +43,8 @@ class Int8(SerializedObject):
         return int.from_bytes(self.raw_bytes, "little")
 
     @staticmethod
-    def from_stream(handle: BinaryIO):
-        raw_bytes = handle.read(1)
+    def from_stream(stream: BinaryIO):
+        raw_bytes = stream.read(1)
         return Int8(raw_bytes)
 
     def __repr__(self):
@@ -75,8 +75,8 @@ class Int32(SerializedObject):
         return int.from_bytes(self.raw_bytes, "little")
 
     @staticmethod
-    def from_stream(handle: BinaryIO):
-        raw_bytes = handle.read(4)
+    def from_stream(stream: BinaryIO):
+        raw_bytes = stream.read(4)
         return Int32(raw_bytes)
 
     def __repr__(self):
@@ -94,8 +94,8 @@ class Double(SerializedObject):
         return struct.unpack('<f', self.raw_bytes)[0]
 
     @staticmethod
-    def from_stream(handle: BinaryIO):
-        raw_bytes = handle.read(8)
+    def from_stream(stream: BinaryIO):
+        raw_bytes = stream.read(8)
         return Double(raw_bytes)
 
 class KnickKnack(SerializedObject):
@@ -135,11 +135,11 @@ class LengthPrefixedString(SerializedObject):
         self.length = byte_length
 
     @staticmethod
-    def from_stream(handle: BinaryIO):
+    def from_stream(stream: BinaryIO):
         raw_length_bytes = b""
         length_byte_list = []
         for i in range(5):
-            new_byte = handle.read(1)
+            new_byte = stream.read(1)
             raw_length_bytes += new_byte
             length_byte_list.append(new_byte[0])
 
@@ -148,7 +148,7 @@ class LengthPrefixedString(SerializedObject):
 
         string_length = concat_7bits(length_byte_list)
 
-        section_string = handle.read(string_length)
+        section_string = stream.read(string_length)
         string = section_string.decode("utf-8")
 
         raw_bytes = raw_length_bytes + section_string
