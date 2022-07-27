@@ -3,10 +3,8 @@ import mock
 import unittest
 
 from .helper import assertEndOfStream, assertEqualToStream
-from underrail_translation_kit.msnrbf_parser.binary_object_string import BinaryObjectString
 from underrail_translation_kit.msnrbf_parser.loaders import _load_class_value
 from underrail_translation_kit.msnrbf_parser.serialized_object import SerializedObject
-from underrail_translation_kit.msnrbf_parser.misc_record_classes import MemberReference
 
 class ClassValueLoaderTest(unittest.TestCase):
 
