@@ -56,6 +56,11 @@ def __load_primitive_value(stream: BinaryIO, primitive_type: PrimitiveType):
     else:
         raise Exception(f"Not Implemented: {primitive_type}")
 
+def __load_object_value(stream: BinaryIO) -> SerializedObject:
+    header = stream.read(1)  # increment stream pointer
+    assert header == b"\x0A"
+    return ObjectNull()
+
 def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ValueArray:
     items = []
 
@@ -71,9 +76,7 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
         elif type == BinaryType.Primitive:
             new_item = __load_primitive_value(stream, primitive_type_list[i])
         elif type == BinaryType.Object:
-            header = stream.read(1)  # increment stream pointer
-            assert header == b"\x0A"
-            new_item = ObjectNull()
+            new_item = __load_object_value(stream)
         elif type == BinaryType.StringArray:
             header = stream.read(1)
             if header == b"\x11":
