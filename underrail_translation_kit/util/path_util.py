@@ -13,11 +13,3 @@ def list_all_files(data_dir: str, targets: List[str]) -> List[str]:
                     file_list.append(fn)
 
     return file_list
-
-def get_relative_path_from_data(path: Path) -> Path:
-    index_of_data = -1
-    for i, part in enumerate(path.parts):
-        if part == "data":
-            index_of_data = i
-            break
-    return Path("/".join(path.parts[index_of_data + 1:]))

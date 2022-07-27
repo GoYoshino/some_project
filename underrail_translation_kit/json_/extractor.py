@@ -6,7 +6,7 @@ from typing import List, Dict
 from underrail_translation_kit.unpacker import unpack_as_stream
 from underrail_translation_kit.msnrbf_parser import ParseResult, parse_binary_stream
 from underrail_translation_kit.json_.postprocess import postprocess
-from underrail_translation_kit.util import list_all_files, get_relative_path_from_data, UnderrailPath
+from underrail_translation_kit.util import list_all_files, UnderrailPath
 
 TARGETS = [
     "*.udlg",
