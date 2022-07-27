@@ -1,4 +1,4 @@
-from typing import BinaryIO, Tuple, Dict, List
+from typing import BinaryIO, Tuple, Dict
 
 from .enums import RecordType, BinaryType, PrimitiveType, BinaryArrayType
 from .binary_object_string import BinaryObjectString
@@ -112,6 +112,7 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
         items.append(new_item)
 
     return ValueArray(items)
+
 
 def load_system_class_with_members_and_types(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SystemClassWithMembersAndTypes:
     """
