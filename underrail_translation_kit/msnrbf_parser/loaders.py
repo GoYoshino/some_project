@@ -61,6 +61,24 @@ def __load_object_value(stream: BinaryIO) -> SerializedObject:
     assert header == b"\x0A"
     return ObjectNull()
 
+def __load_string_array_value(stream: BinaryIO) -> SerializedObject:
+    header = stream.read(1)
+    if header == b"\x11":
+        return ArraySingleString.from_stream(stream)
+    elif header == b"\x09":
+        return MemberReference.from_stream(stream)
+    else:
+        raise Exception(f"unexpected header: {header}")
+
+def __load_system_class_value(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
+    header = stream.read(1)
+    if header == b"\x04":
+        return load_system_class_with_members_and_types(stream, class_info_dict)
+    elif header == b"\x09":
+        return MemberReference.from_stream(stream)
+    else:
+        raise Exception(f"unexpected header: {header}")
+
 def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ValueArray:
     items = []
 
@@ -71,6 +89,8 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
         new_item = None
         if type == BinaryType.String:
             new_item = __load_string_value(stream)
+        elif type == BinaryType.SystemClass:
+            new_item = __load_system_class_value(stream, class_info_dict)
         elif type == BinaryType.Class:
             new_item = __load_class_value(stream, class_info_dict)
         elif type == BinaryType.Primitive:
@@ -78,22 +98,7 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
         elif type == BinaryType.Object:
             new_item = __load_object_value(stream)
         elif type == BinaryType.StringArray:
-            header = stream.read(1)
-            if header == b"\x11":
-                # TODO: duplication!
-                new_item = ArraySingleString.from_stream(stream)
-            elif header == b"\x09":
-                new_item = MemberReference.from_stream(stream)
-            else:
-                raise Exception(f"unexpected header: {header}")
-        elif type == BinaryType.SystemClass:
-            header = stream.read(1)
-            if header == b"\x04":
-                new_item = load_system_class_with_members_and_types(stream, class_info_dict)
-            elif header == b"\x09":
-                new_item = MemberReference.from_stream(stream)
-            else:
-                raise Exception(f"unexpected header: {header}")
+            new_item = __load_string_value(stream)
         else:
             raise Exception(f"Not Implemented: {type}")
 
