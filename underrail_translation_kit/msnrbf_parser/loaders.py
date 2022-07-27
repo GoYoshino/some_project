@@ -8,10 +8,11 @@ from .system_class_with_members_and_types import SystemClassWithMembersAndTypes
 from .misc_record_classes import MemberReference, BinaryArray, ArraySingleString
 from .object_null import ObjectNull
 from .primitives import RecordHeader, Int8, Int16, Int32, Double, KnickKnack, NoneObject
+from .serialized_object import SerializedObject
 from .structure import ClassInfo, MemberTypeInfo, ClassTypeInfo
 from .value_array import ValueArray
 
-def __load_string_value(stream: BinaryIO):
+def __load_string_value(stream: BinaryIO) -> SerializedObject:
     header = stream.read(1)  # increment stream pointer
     if header == b"\x06":
         return BinaryObjectString.from_stream(stream)
@@ -19,6 +20,19 @@ def __load_string_value(stream: BinaryIO):
         return MemberReference.from_stream(stream)
     else:
         raise Exception(f"unexpected header: {header}")
+
+def __load_class_value(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
+    header = stream.read(1)  # increment stream pointer
+    if header == b"\x01":  # 01_ClassWithID
+        return load_class_with_id(stream, class_info_dict)
+    elif header == b"\x05":  # 05_ClassWithMembersAndTypes
+        return load_class_with_members_and_types(stream, class_info_dict)
+    elif header == b"\x09":
+        return MemberReference.from_stream(stream)
+    elif header == b"\x0A":  # objectnull
+        return ObjectNull()
+    else:
+        raise Exception(f"unexpected class header: {header}")
 
 def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ValueArray:
     items = []
@@ -30,19 +44,8 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
         new_item = None
         if type == BinaryType.String:
             new_item = __load_string_value(stream)
-
         elif type == BinaryType.Class:
-            header = stream.read(1)  # increment stream pointer
-            if header == b"\x01":   # 01_ClassWithID
-                new_item = load_class_with_id(stream, class_info_dict)
-            elif header == b"\x05":   # 05_ClassWithMembersAndTypes
-                new_item = load_class_with_members_and_types(stream, class_info_dict)
-            elif header == b"\x09":
-                new_item = MemberReference.from_stream(stream)
-            elif header == b"\x0A":     # objectnull
-                new_item = ObjectNull()
-            else:
-                raise Exception(f"unexpected class header: {header}")
+            new_item = __load_class_value(stream, class_info_dict)
         elif type == BinaryType.Primitive:
             prim_type = primitive_type_list[i]
             if prim_type == PrimitiveType.Boolean:
