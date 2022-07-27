@@ -1,4 +1,4 @@
-from typing import BinaryIO, Tuple, Dict
+from typing import BinaryIO, Tuple, Dict, List
 
 from .enums import RecordType, BinaryType, PrimitiveType, BinaryArrayType
 from .binary_object_string import BinaryObjectString
@@ -34,6 +34,28 @@ def __load_class_value(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassI
     else:
         raise Exception(f"unexpected class header: {header}")
 
+def __load_primitive_value(stream: BinaryIO, primitive_type: PrimitiveType):
+    if primitive_type == PrimitiveType.Boolean:
+        return KnickKnack.from_stream(stream, 1, "Boolean")
+    elif primitive_type == PrimitiveType.Byte:
+        return Int8.from_stream(stream)
+    elif primitive_type == PrimitiveType.Int16:
+        return Int16.from_stream(stream)
+    elif primitive_type == PrimitiveType.Int32:
+        return Int32.from_stream(stream)
+    elif primitive_type == PrimitiveType.Int64:
+        return KnickKnack.from_stream(stream, 8, "Int64")
+    elif primitive_type == PrimitiveType.Double:
+        return Double.from_stream(stream)
+    elif primitive_type == PrimitiveType.Single:
+        return KnickKnack.from_stream(stream, 4, "Single")
+    elif primitive_type == PrimitiveType.UInt32:
+        return KnickKnack.from_stream(stream, 4, "UInt32")
+    elif primitive_type == PrimitiveType.TimeSpan:
+        return KnickKnack.from_stream(stream, 8, "TimeSpan")
+    else:
+        raise Exception(f"Not Implemented: {primitive_type}")
+
 def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ValueArray:
     items = []
 
@@ -47,27 +69,7 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
         elif type == BinaryType.Class:
             new_item = __load_class_value(stream, class_info_dict)
         elif type == BinaryType.Primitive:
-            prim_type = primitive_type_list[i]
-            if prim_type == PrimitiveType.Boolean:
-                new_item = KnickKnack.from_stream(stream, 1, "Boolean")
-            elif prim_type == PrimitiveType.Byte:
-                new_item = Int8.from_stream(stream)
-            elif prim_type == PrimitiveType.Int16:
-                new_item = Int16.from_stream(stream)
-            elif prim_type == PrimitiveType.Int32:
-                new_item = Int32.from_stream(stream)
-            elif prim_type == PrimitiveType.Int64:
-                new_item = KnickKnack.from_stream(stream, 8, "Int64")
-            elif prim_type == PrimitiveType.Double:
-                new_item = Double.from_stream(stream)
-            elif prim_type == PrimitiveType.Single:
-                new_item = KnickKnack.from_stream(stream, 4, "Single")
-            elif prim_type == PrimitiveType.UInt32:
-                new_item = KnickKnack.from_stream(stream, 4, "UInt32")
-            elif prim_type == PrimitiveType.TimeSpan:
-                new_item = KnickKnack.from_stream(stream, 8, "TimeSpan")
-            else:
-                raise Exception(f"Not Implemented: {prim_type}")
+            new_item = __load_primitive_value(stream, primitive_type_list[i])
         elif type == BinaryType.Object:
             header = stream.read(1)  # increment stream pointer
             assert header == b"\x0A"
