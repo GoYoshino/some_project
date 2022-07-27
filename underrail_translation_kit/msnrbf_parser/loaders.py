@@ -159,7 +159,7 @@ def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tu
     """
     注: かなり雑な実装で、arrayの長さを1と仮定している。こんな実装でよく動いたな？
     バイナリに2以上の長さのものが出てきたら再実装の必要あり
-    :param stream: 
+    :param stream: *必ずヘッダを含まない開始地点であること*
     :param class_info_appeared_so_far: 
     :return: 
     """
@@ -171,12 +171,14 @@ def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tu
     lengths = KnickKnack.from_stream(stream, rank.value()*4)
 
     array_type = BinaryArrayType(binary_array_type_enum.value())
-    if (array_type == BinaryArrayType.SingleOffset
-        or array_type == BinaryArrayType.JaggedOffset
-        or array_type == BinaryArrayType.RectangularOffset):
-        lower_bounds = KnickKnack.from_stream(stream, rank.value()*4)
-    else:
-        lower_bounds = NoneObject()
+    assert array_type == BinaryArrayType.Single
+
+    #if (array_type == BinaryArrayType.SingleOffset
+    #    or array_type == BinaryArrayType.JaggedOffset
+    #    or array_type == BinaryArrayType.RectangularOffset):
+    #    lower_bounds = KnickKnack.from_stream(stream, rank.value()*4)
+    #else:
+    lower_bounds = NoneObject()
 
     type_enum = Int8.from_stream(stream)
 
@@ -208,7 +210,7 @@ def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tu
     elif header.record_type == RecordType.ClassWithId:
         values = load_class_with_id(stream, class_info_appeared_so_far)
     else:
-        print(record_type.raw_bytes + object_id. raw_bytes + binary_array_type_enum.raw_bytes + rank.raw_bytes + lengths.raw_bytes)
+        print(record_type.raw_bytes + object_id.raw_bytes + binary_array_type_enum.raw_bytes + rank.raw_bytes + lengths.raw_bytes)
         raise Exception(f"Not implemented: {header.record_type}")
 
     return BinaryArray(record_type, object_id, binary_array_type_enum, rank, lengths, lower_bounds, type_enum, additional_type_info, values)
