@@ -2,6 +2,7 @@ from typing import BinaryIO
 
 from .binary_object_string import BinaryObjectString
 from .enums import RecordType
+from .object_null import ObjectNull
 from .primitives import Int8, Int32, RecordHeader, LengthPrefixedString, KnickKnack, NoneObject
 from .record import Record
 from .serialized_object import SerializedObject
@@ -126,7 +127,7 @@ class ArraySingleString(Record):
             if header.raw_bytes == b"\x06":
                 values.append(BinaryObjectString.from_stream(stream))
             elif header.raw_bytes == b"\x0A":
-                values.append(NoneObject())
+                values.append(ObjectNull())
             elif header.raw_bytes == b"\x0D":   # 0D_ObjectNullMultiple256
                 object_null = ObjectNullMultiple256.from_stream(stream)
                 values.append(object_null)
