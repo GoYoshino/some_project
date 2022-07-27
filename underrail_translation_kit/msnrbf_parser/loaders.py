@@ -24,14 +24,14 @@ def _load_string_value(stream: BinaryIO) -> SerializedObject:
 
 
 def _load_class_value(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
-    header = stream.read(1)  # increment stream pointer
-    if header == b"\x01":  # 01_ClassWithID
+    header = RecordHeader.from_stream(stream)
+    if header.record_type == RecordType.ClassWithId:
         return load_class_with_id(stream, class_info_dict)
-    elif header == b"\x05":  # 05_ClassWithMembersAndTypes
+    elif header.record_type == RecordType.ClassWithMembersAndTypes:
         return load_class_with_members_and_types(stream, class_info_dict)
-    elif header == b"\x09":
+    elif header.record_type == RecordType.MemberReference:
         return MemberReference.from_stream(stream)
-    elif header == b"\x0A":  # objectnull
+    elif header.record_type == RecordType.ObjectNull:
         return ObjectNull()
     else:
         raise Exception(f"unexpected class header: {header}")
