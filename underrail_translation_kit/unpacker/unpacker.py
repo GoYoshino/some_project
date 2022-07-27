@@ -3,11 +3,22 @@ from typing import BinaryIO
 
 from .util import AltGzipFile
 
-def unpack_as_stream(filename: str) -> BinaryIO:
-    byte_array = unpack(filename)
+def unpack_as_stream(filepath: str) -> BinaryIO:
+    """
+    指定されたunderrailファイルを読み込み、MS-NRBFとして読み込めるバイト列をストリームとして返す。
+    :param filepath: ファイルパス
+    :return: バイト列、MS-NRBF準拠
+    """
+    byte_array = unpack(filepath)
     return BytesIO(byte_array)
 
 def unpack(filename: str) -> bytes:
+    """
+    指定されたunderrailファイルを読み込み、MS-NRBFとして読み込めるバイト列を返す。
+    :param filepath: ファイルパス
+    :return: バイト列、MS-NRBF準拠
+    """
+
     with open(filename, "rb") as f:
         f.seek(24)
         gzip_magic = f.read(2)
