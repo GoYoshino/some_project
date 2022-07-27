@@ -8,10 +8,6 @@ from underrail_translation_kit.msnrbf_parser import ParseResult, parse_binary_st
 from underrail_translation_kit.json_.postprocess import postprocess
 from underrail_translation_kit.util import list_all_files, get_relative_path_from_data, UnderrailPath
 
-# now constant for development. will be command line in future
-UNDERRAIL_DATA_DIR = Path(r"G:\SteamLibrary\steamapps\common\Underrail\data")
-JSON_OUT_DIR = Path("G:/underrail_json_test")
-
 TARGETS = [
     "*.udlg",
     "*.k",
@@ -63,8 +59,12 @@ def extract(underrail_root: str, json_root: str, dry_mode=True):
         json_data = postprocess(json_data)
 
         if not dry_mode:
+            os.makedirs(path.json_dir(), exist_ok=True)
             with open(path.json(), "w") as f:
                 json.dump(json_data, f, indent=4)
 
 if __name__ == "__main__":
-    extract(UNDERRAIL_DATA_DIR, JSON_OUT_DIR)
+    # (※使用例)
+    UNDERRAIL_DATA_DIR = Path(r"G:\SteamLibrary\steamapps\common\Underrail\data")
+    JSON_OUT_DIR = Path(r"G:\underrail_json_test\data")
+    extract(UNDERRAIL_DATA_DIR, JSON_OUT_DIR, False)
