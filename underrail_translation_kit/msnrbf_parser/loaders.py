@@ -12,7 +12,8 @@ from .serialized_object import SerializedObject
 from .structure import ClassInfo, MemberTypeInfo, ClassTypeInfo
 from .value_array import ValueArray
 
-def __load_string_value(stream: BinaryIO) -> SerializedObject:
+
+def _load_string_value(stream: BinaryIO) -> SerializedObject:
     header = stream.read(1)  # increment stream pointer
     if header == b"\x06":
         return BinaryObjectString.from_stream(stream)
@@ -21,7 +22,8 @@ def __load_string_value(stream: BinaryIO) -> SerializedObject:
     else:
         raise Exception(f"unexpected header: {header}")
 
-def __load_class_value(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
+
+def _load_class_value(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
     header = stream.read(1)  # increment stream pointer
     if header == b"\x01":  # 01_ClassWithID
         return load_class_with_id(stream, class_info_dict)
@@ -34,7 +36,8 @@ def __load_class_value(stream: BinaryIO, class_info_dict: Dict[int, Tuple[ClassI
     else:
         raise Exception(f"unexpected class header: {header}")
 
-def __load_primitive_value(stream: BinaryIO, primitive_type: PrimitiveType):
+
+def _load_primitive_value(stream: BinaryIO, primitive_type: PrimitiveType):
     if primitive_type == PrimitiveType.Boolean:
         return KnickKnack.from_stream(stream, 1, "Boolean")
     elif primitive_type == PrimitiveType.Byte:
@@ -56,12 +59,14 @@ def __load_primitive_value(stream: BinaryIO, primitive_type: PrimitiveType):
     else:
         raise Exception(f"Not Implemented: {primitive_type}")
 
-def __load_object_value(stream: BinaryIO) -> SerializedObject:
+
+def _load_object_value(stream: BinaryIO) -> SerializedObject:
     header = stream.read(1)  # increment stream pointer
     assert header == b"\x0A"
     return ObjectNull()
 
-def __load_string_array_value(stream: BinaryIO) -> SerializedObject:
+
+def _load_string_array_value(stream: BinaryIO) -> SerializedObject:
     header = stream.read(1)
     if header == b"\x11":
         return ArraySingleString.from_stream(stream)
@@ -70,7 +75,8 @@ def __load_string_array_value(stream: BinaryIO) -> SerializedObject:
     else:
         raise Exception(f"unexpected header: {header}")
 
-def __load_system_class_value(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
+
+def _load_system_class_value(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> SerializedObject:
     header = stream.read(1)
     if header == b"\x04":
         return load_system_class_with_members_and_types(stream, class_info_appeared_so_far)
@@ -78,6 +84,7 @@ def __load_system_class_value(stream: BinaryIO, class_info_appeared_so_far: Dict
         return MemberReference.from_stream(stream)
     else:
         raise Exception(f"unexpected header: {header}")
+
 
 def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ValueArray:
     items = []
@@ -88,17 +95,17 @@ def load_values(stream: BinaryIO, class_info: Tuple[ClassInfo, MemberTypeInfo], 
     for i, type in enumerate(type_list):
         new_item = None
         if type == BinaryType.String:
-            new_item = __load_string_value(stream)
+            new_item = _load_string_value(stream)
         elif type == BinaryType.SystemClass:
-            new_item = __load_system_class_value(stream, class_info_appeared_so_far)
+            new_item = _load_system_class_value(stream, class_info_appeared_so_far)
         elif type == BinaryType.Class:
-            new_item = __load_class_value(stream, class_info_appeared_so_far)
+            new_item = _load_class_value(stream, class_info_appeared_so_far)
         elif type == BinaryType.Primitive:
-            new_item = __load_primitive_value(stream, primitive_type_list[i])
+            new_item = _load_primitive_value(stream, primitive_type_list[i])
         elif type == BinaryType.Object:
-            new_item = __load_object_value(stream)
+            new_item = _load_object_value(stream)
         elif type == BinaryType.StringArray:
-            new_item = __load_string_value(stream)
+            new_item = _load_string_value(stream)
         else:
             raise Exception(f"Not Implemented: {type}")
 
@@ -121,6 +128,7 @@ def load_system_class_with_members_and_types(stream: BinaryIO, class_info_appear
 
     return SystemClassWithMembersAndTypes(record_type, class_info, member_type_info, values)
 
+
 def load_class_with_members_and_types(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> ClassWithMembersAndTypes:
 
     record_type = RecordHeader(RecordType.ClassWithMembersAndTypes)
@@ -135,6 +143,7 @@ def load_class_with_members_and_types(stream: BinaryIO, class_info_appeared_so_f
 
     return ClassWithMembersAndTypes(record_type, class_info, member_type_info, library_id, values)
 
+
 def load_class_with_id(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
         record_type = RecordHeader(RecordType.ClassWithId)
         object_id = Int32.from_stream(stream)
@@ -143,6 +152,7 @@ def load_class_with_id(stream: BinaryIO, class_info_appeared_so_far: Dict[int, T
         class_info = class_info_appeared_so_far[metadata_id.value()]
         values = load_values(stream, class_info, class_info_appeared_so_far)
         return ClassWithID(record_type, object_id, metadata_id, values, class_info)
+
 
 def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]):
         record_type = RecordHeader(RecordType.BinaryArray)
@@ -189,6 +199,5 @@ def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tu
         else:
             print(record_type.raw_bytes + object_id. raw_bytes + binary_array_type_enum.raw_bytes + rank.raw_bytes + lengths.raw_bytes)
             raise Exception(f"Not implemented: {header.record_type}")
-
 
         return BinaryArray(record_type, object_id, binary_array_type_enum, rank, lengths, lower_bounds, type_enum, additional_type_info, values)
