@@ -61,8 +61,8 @@ def _load_primitive_value(stream: BinaryIO, primitive_type: PrimitiveType):
 
 
 def _load_object_value(stream: BinaryIO) -> SerializedObject:
-    header = stream.read(1)  # increment stream pointer
-    assert header == b"\x0A"
+    header = RecordHeader.from_stream(stream)
+    assert header.record_type == RecordType.ObjectNull
     return ObjectNull()
 
 
