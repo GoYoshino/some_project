@@ -15,6 +15,5 @@ def unpack(filename: str) -> bytes:
             f.seek(f.tell() - 2)
             return AltGzipFile(fileobj=f, mode="rb").read()
         else:
-            print(gzip_magic)
             f.seek(f.tell() - 2)
             return f.read()

@@ -8,13 +8,10 @@ LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ac nisl
 class RecalcTest(unittest.TestCase):
 
     def test_replace_and_recalc(self):
-        print(b"\r")
         with open("msnrbf_parser/data/sgscredits", "rb") as f:
             result = parse_binary_stream(f)
             assertEqualToStream(self, result.raw_bytes, f)
 
-        #print(result.get_member_class_dict())
-        dic = result.get_member_class_dict()
         result.replace_text(LOREM, 6)
         self.assertEqual(result.get_text(6), LOREM)
         self.assertEqual(len(result.get_text(6)), 1158)
