@@ -3,6 +3,7 @@
 単体テストのように常に走らせる類のものではないことに注意
 """
 
+import sys
 import tqdm
 
 from underrail_translation_kit.msnrbf_parser import parse_binary_stream
@@ -17,14 +18,22 @@ if __name__ == "__main__":
 
     print(f"testing {len(files)} files..")
 
+    corrupt_count = 0
     for i in tqdm.tqdm(range(len(files))):
         file = files[i]
         with unpack_as_stream(file) as stream:
-            object_ = parse_binary_stream(stream)
-            stream.seek(0)
-            file_raw_bytes = stream.read()
-            if not object_.raw_bytes == file_raw_bytes:
-                print(f"Raw bytes does not match at {file}:")
-                print(f"OBJ:{object_.raw_bytes}")
-                print(f"DAT:{file_raw_bytes}")
-                print(object_)
+            try:
+                object_ = parse_binary_stream(stream)
+                stream.seek(0)
+                file_raw_bytes = stream.read()
+                if not object_.raw_bytes == file_raw_bytes:
+                    print(f"Raw bytes does not match at {file}:")
+                    print(f"OBJ:{object_.raw_bytes}")
+                    print(f"DAT:{file_raw_bytes}")
+                    print(object_)
+                    corrupt_count += 1
+            except Exception:
+                print(f"Exception at {file}")
+                print(sys.exc_info()[2])
+
+    print(f"done. {corrupt_count} files are corrupted.")
