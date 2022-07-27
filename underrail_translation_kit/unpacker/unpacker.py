@@ -11,9 +11,8 @@ def unpack(filename: str) -> bytes:
     with open(filename, "rb") as f:
         f.seek(24)
         gzip_magic = f.read(2)
+        f.seek(f.tell() - 2)
         if gzip_magic == b"\x1F\x8B":
-            f.seek(f.tell() - 2)
             return AltGzipFile(fileobj=f, mode="rb").read()
         else:
-            f.seek(f.tell() - 2)
             return f.read()

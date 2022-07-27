@@ -61,3 +61,14 @@ class UnderrailPath:
         if self.__patch_root is None:
             raise Exception("patch data dirが登録されていません")
         return os.path.join(str(self.__patch_root), str(self.__relative_dir), str(self.__unsuffixed_filename))
+
+    def json_dir(self) -> str:
+        return os.path.join(str(self.__json_root), str(self.__relative_dir))
+
+    def datafile_dir(self) -> str:
+        return os.path.join(str(self.__underrail_data_root), str(self.__relative_dir))
+
+    def patch_dir(self):
+        if self.__patch_root is None:
+            raise Exception("patch data dirが登録されていません")
+        return os.path.join(str(self.__patch_root), str(self.__relative_dir))
