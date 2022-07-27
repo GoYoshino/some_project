@@ -1,10 +1,10 @@
 from typing import BinaryIO
 
+from .enums import RecordType
 from .binary_object_string import BinaryObjectString
 from .loaders import load_system_class_with_members_and_types, load_class_with_members_and_types, load_class_with_id, load_binary_array
 from .misc_record_classes import SerializationHeader, BinaryLibrary, MessageEnd, ArraySingleString
 from .parse_result import ParseResult
-from .record import RecordType
 
 def parse_binary_stream(stream: BinaryIO) -> ParseResult:
     result = []
