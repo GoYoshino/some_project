@@ -44,7 +44,7 @@ class BinaryArray(Record):
     """
 
     def __init__(self, record_header: RecordHeader, object_id: Int32,
-                 binary_array_type_enum: Int8, rank: Int32, lengths: KnickKnack, lower_bounds: KnickKnack,
+                 binary_array_type_enum: Int8, rank: Int32, lengths: KnickKnack, lower_bounds: SerializedObject,
                  type_enum: Int8, additional_type_info: KnickKnack, values: SerializedObject):
         super().__init__(record_header,
                          [ object_id,
