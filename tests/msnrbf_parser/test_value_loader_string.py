@@ -19,6 +19,7 @@ class StringValueLoaderTest(unittest.TestCase):
         assertEqualToStream(self, result.raw_bytes, stream)
 
     def test_loading_member_reference(self):
+        # use actual value rather than a mock because available
         expected_idref = 2500
         stream = BytesIO(b"\x09" + expected_idref.to_bytes(4, "little"))
         result = _load_string_value(stream)
