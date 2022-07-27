@@ -67,10 +67,10 @@ def _load_object_value(stream: BinaryIO) -> SerializedObject:
 
 
 def _load_string_array_value(stream: BinaryIO) -> SerializedObject:
-    header = stream.read(1)
-    if header == b"\x11":
+    header = RecordHeader.from_stream(stream)
+    if header.record_type == RecordType.ArraySingleString:
         return ArraySingleString.from_stream(stream)
-    elif header == b"\x09":
+    elif header.record_type == RecordType.MemberReference:
         return MemberReference.from_stream(stream)
     else:
         raise Exception(f"unexpected header: {header}")
