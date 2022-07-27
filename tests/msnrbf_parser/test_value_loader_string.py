@@ -1,7 +1,3 @@
-"""
-Loaderのありうるすべての場合をカバーしたい
-"""
-
 import unittest
 from io import BytesIO
 
