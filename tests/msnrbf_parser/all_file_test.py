@@ -3,8 +3,6 @@
 単体テストのように常に走らせる類のものではないことに注意
 """
 
-import difflib
-import sys
 import tqdm
 
 from underrail_translation_kit.msnrbf_parser import parse_binary_stream
