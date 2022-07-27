@@ -14,10 +14,10 @@ from .value_array import ValueArray
 
 
 def _load_string_value(stream: BinaryIO) -> SerializedObject:
-    header = stream.read(1)  # increment stream pointer
-    if header == b"\x06":
+    header = RecordHeader.from_stream(stream)
+    if header.record_type == RecordType.BinaryObjectString:
         return BinaryObjectString.from_stream(stream)
-    elif header == b"\x09":
+    elif header.record_type == RecordType.MemberReference:
         return MemberReference.from_stream(stream)
     else:
         raise Exception(f"unexpected header: {header}")
