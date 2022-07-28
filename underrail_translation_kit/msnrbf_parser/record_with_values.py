@@ -31,3 +31,6 @@ class RecordWithValues(metaclass=abc.ABCMeta):
 
     def replace_text(self, new_string: str, object_id: int) -> None:
         raise NotImplementedError()
+
+    def get_all_texts(self) -> Dict[int, BinaryObjectString]:
+        raise NotImplementedError()

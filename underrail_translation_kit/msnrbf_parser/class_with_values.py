@@ -31,23 +31,30 @@ class ClassWithValues(Record, RecordWithValues):
         self.__meta_member_type_info = meta_member_type_info
         self.__values = values
 
-        self.__generate_string_member_dictionary()
+        self.__generate_member_dictionaries()
 
 
-    def __generate_string_member_dictionary(self):
+    def __generate_member_dictionaries(self) -> None:
         binary_type_list = self.__meta_member_type_info.get_binary_type_list()
-        dictionary = {}
+        string_dictionary = {}
+        record_with_value_dictionary = {}
         for i, binary_type in enumerate(binary_type_list):
-            if binary_type != BinaryType.String:
-                continue
-            item = self.__values.get_item(i)
-            if isinstance(item, MemberReference):
-                continue
-            assert isinstance(item, BinaryObjectString), f"not a BinaryObjectString: {item}"
-            item_bos: BinaryObjectString = item
-            dictionary[item_bos.get_object_id()] = item
+            if binary_type == BinaryType.Class:
+                item = self.__values.get_item(i)
+                if not isinstance(item, RecordWithValues):
+                    continue
+                record_with_value_dictionary[item.get_object_id()] = item
 
-        self.__string_member_dictionary = dictionary
+            elif binary_type == BinaryType.String:
+                item = self.__values.get_item(i)
+                if isinstance(item, MemberReference):
+                    continue
+                assert isinstance(item, BinaryObjectString), f"not a BinaryObjectString: {item}"
+                item_bos: BinaryObjectString = item
+                string_dictionary[item_bos.get_object_id()] = item
+
+        self.__string_member_dictionary = string_dictionary
+        self.__record_with_value_dictionary = record_with_value_dictionary
 
     def get_object_id(self):
         return self.__meta_class_info.get_object_id()
@@ -76,3 +83,14 @@ class ClassWithValues(Record, RecordWithValues):
 
     def get_class_info_tuple(self) -> Tuple[ClassInfo, MemberTypeInfo]:
         return (self.__meta_class_info, self.__meta_member_type_info)
+
+    def get_all_texts(self) -> Dict[int, Tuple[BinaryObjectString, str]]:
+        result = {}
+        for i in range(self.__meta_class_info.count()):
+            item = self.__values.get_item(i)
+            if isinstance(item, RecordWithValues):
+                result.update(item.get_all_texts())
+            elif isinstance(item, BinaryObjectString):
+                result[item.get_object_id()] = (item, "")
+
+        return result
