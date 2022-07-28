@@ -33,11 +33,14 @@ class UnderrailPath:
         index = self.__get_data_directory_index(path)
         return Path(os.sep.join(path.parts[index + 1:-1]))
 
-    def __get_data_directory_index(self, path: Path):
+    def __get_data_directory_index(self, path: Path) -> int:
+        index = -1
         for i, part in enumerate(path.parts):
             if part == "data":
-                return i
-        raise Exception(f'パスにdataディレクトリが含まれていません: {path}')
+                index = i
+        if index == -1:
+            raise Exception(f'パスにdataディレクトリが含まれていません: {path}')
+        return index
 
     def json(self) -> str:
         """
