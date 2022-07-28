@@ -119,9 +119,13 @@ class ArrayInfo(SerializedObjectArray):
     def __init__(self, object_id: Int32, length: Int32):
         super().__init__([object_id, length])
         self.__length = length
+        self.__object_id = object_id
 
     def get_length(self):
         return self.__length.value()
+
+    def get_object_id(self):
+        return self.__object_id
 
     @staticmethod
     def from_stream(stream: BinaryIO):

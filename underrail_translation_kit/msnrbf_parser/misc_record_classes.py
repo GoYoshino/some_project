@@ -1,5 +1,6 @@
-from typing import BinaryIO
+from typing import BinaryIO, Dict
 
+from underrail_translation_kit.msnrbf_parser.record_with_values import RecordWithValues
 from .binary_object_string import BinaryObjectString
 from .enums import RecordType
 from .object_null import ObjectNull
@@ -104,12 +105,15 @@ class BinaryLibrary(Record):
     def __repr__(self):
         return "BinaryLibrary"
 
-class ArraySingleString(Record):
+
+class ArraySingleString(Record, RecordWithValues):
     """
     Refers to 11(17): ArraySingleString Record
     """
-    def __init__(self, record_header: RecordHeader, array_info: ArrayInfo, values: SerializedObjectArray):
+    def __init__(self, record_header: RecordHeader, array_info: ArrayInfo, values: SerializedObjectArray, string_values_dict: Dict[int, BinaryObjectString]):
         super().__init__(record_header, [array_info, values])
+        self.__array_info = array_info
+        self.__string_values_dict = string_values_dict
 
     @staticmethod
     def from_stream(stream: BinaryIO):
@@ -118,6 +122,7 @@ class ArraySingleString(Record):
         length = array_info.get_length()
 
         values = []
+        string_values = {}
         remaining_null_objects = 0
         for i in range(length):
             if (remaining_null_objects > 0):
@@ -125,7 +130,10 @@ class ArraySingleString(Record):
                 continue
             header = Int8.from_stream(stream)
             if header.raw_bytes == b"\x06":
-                values.append(BinaryObjectString.from_stream(stream))
+                value = BinaryObjectString.from_stream(stream)
+                value_object_id = value.get_object_id()
+                string_values[value_object_id] = value
+                values.append(value)
             elif header.raw_bytes == b"\x0A":
                 values.append(ObjectNull())
             elif header.raw_bytes == b"\x0D":   # 0D_ObjectNullMultiple256
@@ -135,7 +143,32 @@ class ArraySingleString(Record):
             else:
                 raise Exception(f"Unexpected header: {header}")
 
-        return ArraySingleString(record_header, array_info, SerializedObjectArray(values))
+        return ArraySingleString(record_header, array_info, SerializedObjectArray(values), string_values)
+
+    def get_object_id(self) -> int:
+        return self.__array_info.get_object_id()
+
+    def get_name(self):
+        return "array"
+
+    def has_string_member(self, object_id: int) -> bool:
+        return object_id in self.__string_values_dict.keys()
+
+
+    def get_string_member(self, object_id: int) -> BinaryObjectString:
+        return self.__string_values_dict[object_id]
+
+
+    def get_string_member_dict(self) -> Dict[int, BinaryObjectString]:
+        return self.__string_values_dict
+
+
+    def get_text(self, object_id: int) -> str:
+        return self.get_string_member(object_id).get_string()
+
+
+    def replace_text(self, new_string: str, object_id: int) -> None:
+        self.get_string_member(object_id).replace_string(new_string)
 
 
 class ObjectNullMultiple256(Record):
