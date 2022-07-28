@@ -5,12 +5,13 @@ from underrail_translation_kit.msnrbf_parser.enums import BinaryType
 from underrail_translation_kit.msnrbf_parser.misc_record_classes import MemberReference
 from underrail_translation_kit.msnrbf_parser.primitives import RecordHeader
 from underrail_translation_kit.msnrbf_parser.record import Record
+from underrail_translation_kit.msnrbf_parser.record_with_values import RecordWithValues
 from underrail_translation_kit.msnrbf_parser.serialized_object import SerializedObject
 from underrail_translation_kit.msnrbf_parser.structure import ClassInfo, MemberTypeInfo
 from underrail_translation_kit.msnrbf_parser.value_array import ValueArray
 
 
-class ClassWithValues(Record):
+class ClassWithValues(Record, RecordWithValues):
     """
     valueのあるレコードの基底クラス。a.k.a.目的のブツを持っている奴
     BinaryObjectStringを持っている可能性があるため、共通の操作メソッドを持たせることにした。
