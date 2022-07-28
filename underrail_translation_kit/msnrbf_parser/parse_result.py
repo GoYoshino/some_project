@@ -3,6 +3,7 @@ from typing import List, Dict
 from .serialized_object import SerializedObject
 from .serialized_object_array import SerializedObjectArray
 from .class_with_members_and_types import ClassWithMembersAndTypes
+from .class_with_id import ClassWithID
 
 class ParseResult(SerializedObjectArray):
     """
@@ -16,7 +17,7 @@ class ParseResult(SerializedObjectArray):
     def __generate_dictionary(self):
         dictionary = {}
         for item in self.items:
-            if isinstance(item, ClassWithMembersAndTypes):
+            if isinstance(item, ClassWithMembersAndTypes) or isinstance(item, ClassWithID):
                 dictionary[item.get_object_id()] = item
 
         return dictionary

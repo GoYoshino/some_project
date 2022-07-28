@@ -13,6 +13,10 @@ class ClassWithID(Record):
     def __init__(self, record_header: RecordHeader, object_id: Int32, metadata_id: Int32, values: SerializedObjectArray, meta_class_info):
         super().__init__(record_header, [object_id, metadata_id, values])
         self.__meta_class_info = meta_class_info
+        self.__object_id = object_id
+
+    def get_object_id(self) -> int:
+        return self.__object_id.value()
 
     def __repr__(self):
         return "ClassWithID"
