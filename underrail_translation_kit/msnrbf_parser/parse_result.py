@@ -18,8 +18,8 @@ class ParseResult(SerializedObjectArray):
         dictionary = {}
         for item in self.items:
             if isinstance(item, RecordWithValues):
+                assert item.get_object_id() not in dictionary
                 dictionary[item.get_object_id()] = item
-
         return dictionary
 
     def __find_target_record(self, object_id: int) -> RecordWithValues:

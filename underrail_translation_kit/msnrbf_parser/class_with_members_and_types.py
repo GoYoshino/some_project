@@ -21,6 +21,8 @@ class ClassWithMembersAndTypes(ClassWithValues):
     def __repr__(self):
         return f"ClassWithMembersAndTypes: [{str(self.__class_info)}, {str(self.__member_type_info)}, {str(self.__library_id)}, values={str(self.__values)}]"
 
-
     def get_class_info_tuple(self) -> Tuple[ClassInfo, MemberTypeInfo]:
         return (self.__class_info, self.__member_type_info)
+
+    def get_object_id(self) -> int:
+        return self.__class_info.get_object_id()

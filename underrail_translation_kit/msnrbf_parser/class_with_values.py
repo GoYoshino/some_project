@@ -1,3 +1,4 @@
+import abc
 from typing import List, Dict, Tuple
 
 from underrail_translation_kit.msnrbf_parser.binary_object_string import BinaryObjectString
@@ -9,6 +10,7 @@ from underrail_translation_kit.msnrbf_parser.record_with_values import RecordWit
 from underrail_translation_kit.msnrbf_parser.serialized_object import SerializedObject
 from underrail_translation_kit.msnrbf_parser.structure import ClassInfo, MemberTypeInfo
 from underrail_translation_kit.msnrbf_parser.value_array import ValueArray
+
 
 
 class ClassWithValues(Record, RecordWithValues):
@@ -56,9 +58,6 @@ class ClassWithValues(Record, RecordWithValues):
         self.__string_member_dictionary = string_dictionary
         self.__record_with_value_dictionary = record_with_value_dictionary
 
-    def get_object_id(self):
-        return self.__meta_class_info.get_object_id()
-
     def get_name(self):
         return self.__meta_class_info.get_name()
 
@@ -84,13 +83,13 @@ class ClassWithValues(Record, RecordWithValues):
     def get_class_info_tuple(self) -> Tuple[ClassInfo, MemberTypeInfo]:
         return (self.__meta_class_info, self.__meta_member_type_info)
 
-    def get_all_texts(self) -> Dict[int, Tuple[BinaryObjectString, str]]:
+    def get_all_texts(self) -> Dict[int, BinaryObjectString]:
         result = {}
         for i in range(self.__meta_class_info.count()):
             item = self.__values.get_item(i)
             if isinstance(item, RecordWithValues):
                 result.update(item.get_all_texts())
             elif isinstance(item, BinaryObjectString):
-                result[item.get_object_id()] = (item, "")
+                result[item.get_object_id()] = item
 
         return result
