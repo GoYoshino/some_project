@@ -1,5 +1,6 @@
-from typing import BinaryIO
+from typing import BinaryIO, List, Tuple, Dict
 
+from underrail_translation_kit.msnrbf_parser.structure import ClassInfo, MemberTypeInfo
 from .enums import RecordType
 from .binary_object_string import BinaryObjectString
 from .loaders import load_system_class_with_members_and_types, load_class_with_members_and_types, load_class_with_id, load_binary_array
@@ -8,7 +9,7 @@ from .parse_result import ParseResult
 
 def parse_binary_stream(stream: BinaryIO) -> ParseResult:
     result = []
-    class_info_dict = {}    # TODO: もっと強力な情報統合を可能にするラッパを作ってここにハメてもよい
+    class_info_dict: Dict[int, Tuple[ClassInfo, MemberTypeInfo]] = {}    # TODO: この実体はラッパクラスでいい まとめて使われることが多すぎる
 
     while (True):
         header = stream.read(1)
