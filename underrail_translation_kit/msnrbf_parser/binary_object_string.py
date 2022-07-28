@@ -10,10 +10,11 @@ class BinaryObjectString(Record):
     *Does* care detailed behavior because it is relevant to translation work
     """
 
-    def __init__(self, record_header: RecordHeader, object_id: Int32, value: LengthPrefixedString):
+    def __init__(self, record_header: RecordHeader, object_id: Int32, value: LengthPrefixedString, meta_name: str=""):
         super().__init__(record_header, [object_id, value])
         self.__object_id = object_id
         self.__value = value
+        self.meta_name = meta_name
 
     def get_string(self) -> str:
         return self.__value.string

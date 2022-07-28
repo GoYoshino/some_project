@@ -8,15 +8,17 @@ from underrail_translation_kit.msnrbf_parser import ParseResult, parse_binary_st
 from underrail_translation_kit.json_.postprocess import postprocess
 from underrail_translation_kit.util import list_all_files, UnderrailPath
 
+JSON_VERSION = "0.2"
+
 TARGETS = [
     "*.udlg",
     "*.k",
     "*.item"
 ]
 
-def __generate_json_dictionary(class_name: str, object_id: int, original_text: str, description: str) -> Dict[str, str]:
+def __generate_json_dictionary(class_info: str, object_id: int, original_text: str, description: str) -> Dict[str, str]:
     return {
-        "className": class_name,
+        "classInfo": class_info,
         "objectId": object_id,
         "description": description,
         "originalText": original_text,
@@ -24,14 +26,14 @@ def __generate_json_dictionary(class_name: str, object_id: int, original_text: s
     }
 
 def __extract_from_a_object(obj: ParseResult) -> List[Dict[str, str]]:
-    json_dict_list = []
+    json_dict_list = [ { "jsonVersion": JSON_VERSION } ]
 
     texts = obj.get_all_texts()
     for index in texts:
         text = texts[index]
         object_id = text.get_object_id()
 
-        json_dict = __generate_json_dictionary("", object_id, text.get_string(), "n/a")
+        json_dict = __generate_json_dictionary(text.meta_name, object_id, text.get_string(), "n/a")
 
         json_dict_list.append(json_dict)
 
@@ -51,7 +53,7 @@ def extract(underrail_root: str, json_root: str, dry_mode=True):
         print(f"{path.datafile()} => {path.json()}...({i + 1}/{len(paths)})")
         object = __load_object(path.datafile())
         json_data = __extract_from_a_object(object)
-        json_data = postprocess(json_data)
+        #json_data = postprocess(json_data)
 
         if not dry_mode:
             os.makedirs(path.json_dir(), exist_ok=True)

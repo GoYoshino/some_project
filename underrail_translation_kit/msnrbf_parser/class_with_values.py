@@ -82,13 +82,15 @@ class ClassWithValues(Record, RecordWithValues):
     def get_class_info_tuple(self) -> Tuple[ClassInfo, MemberTypeInfo]:
         return (self.__meta_class_info, self.__meta_member_type_info)
 
-    def get_all_texts(self) -> Dict[int, BinaryObjectString]:
+    def get_all_texts(self, class_path: str="") -> Dict[int, BinaryObjectString]:
+        class_path += "." + self.__meta_class_info.get_name()
         result = {}
         for i in range(self.__meta_class_info.count()):
             item = self.__values.get_item(i)
             if isinstance(item, RecordWithValues):
-                result.update(item.get_all_texts())
+                result.update(item.get_all_texts(class_path))
             elif isinstance(item, BinaryObjectString):
+                item.meta_name = class_path + "." + self.__meta_class_info.get_member_name_list()[i]
                 result[item.get_object_id()] = item
 
         return result
