@@ -153,7 +153,7 @@ def load_class_with_id(stream: BinaryIO, class_info_appeared_so_far: Dict[int, T
 
     class_info = class_info_appeared_so_far[metadata_id.value()]
     values = load_values(stream, class_info, class_info_appeared_so_far)
-    return ClassWithID(record_type, object_id, metadata_id, values, class_info)
+    return ClassWithID(record_type, object_id, metadata_id, values, class_info[0], class_info[1])
 
 
 def load_binary_array(stream: BinaryIO, class_info_appeared_so_far: Dict[int, Tuple[ClassInfo, MemberTypeInfo]]) -> BinaryArray:

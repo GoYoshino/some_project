@@ -1,6 +1,0 @@
-G:\SteamLibrary\steamapps\common\Underrail\data\dialogs\characters\xpbl\ferryman.udlg
-
-  File "Q:\underrail_kit\underrail_translation_kit\msnrbf_parser\loaders.py", line 63, in load_values
-    raise Exception(f"Not Implemented: {prim_type}")
-Exception: Not Implemented: PrimitiveType.TimeSpan
-
