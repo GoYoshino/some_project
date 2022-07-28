@@ -14,11 +14,12 @@ class LengthPrefixedStringTest(unittest.TestCase):
         self.assertEqual(obj.string, "This is the internal currency of the South Gate Station.")
         self.assertEqual(obj.length, 56)
 
-    def test_works_on_loooong_text(self):
+    def works_on_loooong_text(self):
         with open("msnrbf_parser/data/uirou_uri", "rb") as stream:
             obj = LengthPrefixedString.from_stream(stream)
             assertEndOfStream(self, stream)
             assertEqualToStream(self, obj.raw_bytes, stream)
+            print(obj)
 
         with open("msnrbf_parser/data/uirou_uri.txt", "r", encoding="utf-8") as stream:
             self.assertEqual(obj.string, stream.read())

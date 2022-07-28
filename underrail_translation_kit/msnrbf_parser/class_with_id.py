@@ -1,4 +1,4 @@
-from .primitives import Int8, Int32
+from .primitives import RecordHeader, Int32
 from .record import Record
 from .serialized_object_array import SerializedObjectArray
 
@@ -10,8 +10,8 @@ class ClassWithID(Record):
         Because header has nothing to do with translation work
         """
 
-    def __init__(self, record_type: Int8, object_id: Int32, metadata_id: Int32, values: SerializedObjectArray, meta_class_info):
-        super().__init__(record_type, [object_id, metadata_id, values])
+    def __init__(self, record_header: RecordHeader, object_id: Int32, metadata_id: Int32, values: SerializedObjectArray, meta_class_info):
+        super().__init__(record_header, [object_id, metadata_id, values])
         self.__meta_class_info = meta_class_info
 
     def __repr__(self):

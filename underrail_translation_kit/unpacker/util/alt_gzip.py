@@ -4,9 +4,7 @@ _logger = logging.getLogger(__name__)
 
 # monkey patch for 2.7
 import sys  
-if sys.version_info[:2] == (2, 7):  
-    # ripped from py 3.4 gzip module
-    # modified for py 2.7 _read()
+if sys.version_info[:2] == (2, 7):
     def read1(self, size=-1):
         self._check_closed()
         if self.mode != gzip.READ:
@@ -16,8 +14,6 @@ if sys.version_info[:2] == (2, 7):
         if self.extrasize <= 0 and self.fileobj is None:
             return b''
 
-        # For certain input data, a single call to _read() may not return
-        # any data. In this case, retry until we get some data or reach EOF.
         try:
             while self.extrasize <= 0 and self._read():
                 pass
