@@ -9,7 +9,7 @@ def __postprocess(json_object: Dict[str, str]) -> bool:
     """
 
     # 1. avoid value: "English" entries spam
-    if json_object["originalText"] == "English":
+    if json_object["originalText"] == "English" and json_object["classInfo"][:9] == ".DM.DM:LL":
         return False
 
     # 2. avoid elements suffixed with something like "(301db70e-7a5a-40db-a103-21e6927c1834)"

@@ -53,7 +53,7 @@ def extract(underrail_root: str, json_root: str, dry_mode=True):
         print(f"{path.datafile()} => {path.json()}...({i + 1}/{len(paths)})")
         object = __load_object(path.datafile())
         json_data = __extract_from_a_object(object)
-        #json_data = postprocess(json_data)
+        json_data = postprocess(json_data)
 
         if not dry_mode:
             os.makedirs(path.json_dir(), exist_ok=True)
