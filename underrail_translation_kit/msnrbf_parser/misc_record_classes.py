@@ -154,21 +154,20 @@ class ArraySingleString(Record, RecordWithValues):
     def has_string_member(self, object_id: int) -> bool:
         return object_id in self.__string_values_dict.keys()
 
-
     def get_string_member(self, object_id: int) -> BinaryObjectString:
         return self.__string_values_dict[object_id]
-
 
     def get_string_member_dict(self) -> Dict[int, BinaryObjectString]:
         return self.__string_values_dict
 
-
     def get_text(self, object_id: int) -> str:
         return self.get_string_member(object_id).get_string()
 
-
     def replace_text(self, new_string: str, object_id: int) -> None:
         self.get_string_member(object_id).replace_string(new_string)
+
+    def get_all_texts(self) -> Dict[int, BinaryObjectString]:
+        return self.__string_values_dict
 
 
 class ObjectNullMultiple256(Record):

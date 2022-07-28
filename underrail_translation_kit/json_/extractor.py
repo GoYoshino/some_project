@@ -26,19 +26,14 @@ def __generate_json_dictionary(class_name: str, object_id: int, original_text: s
 def __extract_from_a_object(obj: ParseResult) -> List[Dict[str, str]]:
     json_dict_list = []
 
-    classes = obj.get_member_class_dict()
-    for key in classes:
-        class_ = classes[key]
-        members = class_.get_string_member_dict()
-        for member_key in members:
-            class_name = class_.get_name()
+    texts = obj.get_all_texts()
+    for index in texts:
+        text = texts[index]
+        object_id = text.get_object_id()
 
-            member = members[member_key]
-            object_id = member.get_object_id()
+        json_dict = __generate_json_dictionary("", object_id, text.get_string(), "n/a")
 
-            json_dict = __generate_json_dictionary(class_name, object_id, member.get_string(), "n/a")
-
-            json_dict_list.append(json_dict)
+        json_dict_list.append(json_dict)
 
     return json_dict_list
 
@@ -65,6 +60,7 @@ def extract(underrail_root: str, json_root: str, dry_mode=True):
 
 if __name__ == "__main__":
     # (※使用例)
-    UNDERRAIL_DATA_DIR = Path(r"G:\SteamLibrary\steamapps\common\Underrail\data")
-    JSON_OUT_DIR = Path(r"G:\underrail_json_test\data")
+    #UNDERRAIL_DATA_DIR = Path(r"D:\SteamLibrary\steamapps\common\Underrail\data")
+    UNDERRAIL_DATA_DIR = Path(r"D:\underrail_jp_full\data\underrail_master\data")
+    JSON_OUT_DIR = Path(r"D:\underrail_json_test\data")
     extract(UNDERRAIL_DATA_DIR, JSON_OUT_DIR, False)

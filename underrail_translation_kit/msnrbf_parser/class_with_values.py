@@ -35,7 +35,6 @@ class ClassWithValues(Record, RecordWithValues):
 
         self.__generate_member_dictionaries()
 
-
     def __generate_member_dictionaries(self) -> None:
         binary_type_list = self.__meta_member_type_info.get_binary_type_list()
         string_dictionary = {}

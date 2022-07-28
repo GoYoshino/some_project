@@ -53,8 +53,10 @@ class ParseResult(SerializedObjectArray):
 
     def get_all_texts(self) -> Dict[int, BinaryObjectString]:
         result = {}
-        for key in self.__records_with_values_dict.keys():
-            obj = self.__records_with_values_dict[key]
-            result.update(obj.get_all_texts())
+        for i, item in enumerate(self.items):
+            if isinstance(item, RecordWithValues):
+                result.update(item.get_all_texts())
+            elif isinstance(item, BinaryObjectString):
+                result[item.get_object_id()] = item
 
         return result
