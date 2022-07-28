@@ -1,6 +1,6 @@
 from typing import List, Dict
 
-from underrail_translation_kit.msnrbf_parser.record_with_values import RecordWithValues
+from underrail_translation_kit.msnrbf_parser.class_with_values import ClassWithValues
 from .serialized_object import SerializedObject
 from .serialized_object_array import SerializedObjectArray
 
@@ -16,12 +16,12 @@ class ParseResult(SerializedObjectArray):
     def __generate_record_with_values_dictionary(self):
         dictionary = {}
         for item in self.items:
-            if isinstance(item, RecordWithValues):
+            if isinstance(item, ClassWithValues):
                 dictionary[item.get_object_id()] = item
 
         return dictionary
 
-    def __find_target_class(self, object_id: int) -> RecordWithValues:
+    def __find_target_class(self, object_id: int) -> ClassWithValues:
         target_class = None
         classes = self.get_member_class_dict()
         for key in classes:
@@ -47,5 +47,5 @@ class ParseResult(SerializedObjectArray):
 
         self.recalc_raw_bytes()
 
-    def get_member_class_dict(self) -> Dict[int, RecordWithValues]:
+    def get_member_class_dict(self) -> Dict[int, ClassWithValues]:
         return self.__dictionary

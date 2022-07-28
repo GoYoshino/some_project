@@ -1,11 +1,11 @@
 from typing import Tuple
 
-from underrail_translation_kit.msnrbf_parser.record_with_values import RecordWithValues
+from underrail_translation_kit.msnrbf_parser.class_with_values import ClassWithValues
 from .primitives import RecordHeader, Int32
 from .structure import ClassInfo, MemberTypeInfo
 from .value_array import ValueArray
 
-class ClassWithMembersAndTypes(RecordWithValues):
+class ClassWithMembersAndTypes(ClassWithValues):
     """
     Refers to 05: ClassWithMembersAndTypes Record
     Does not care detailed behavior as long as the instance preserves original raw byte array

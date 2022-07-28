@@ -10,7 +10,7 @@ from underrail_translation_kit.msnrbf_parser.structure import ClassInfo, MemberT
 from underrail_translation_kit.msnrbf_parser.value_array import ValueArray
 
 
-class RecordWithValues(Record):
+class ClassWithValues(Record):
     """
     valueのあるレコードの基底クラス。a.k.a.目的のブツを持っている奴
     BinaryObjectStringを持っている可能性があるため、共通の操作メソッドを持たせることにした。
