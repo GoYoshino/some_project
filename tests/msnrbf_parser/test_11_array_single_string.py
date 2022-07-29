@@ -82,8 +82,6 @@ class ArraySingleStringTest(unittest.TestCase):
 
     def find_text(self):
         object_id = 500
-        nekochan = BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ")
-        inuchan = BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ")
         values = [
             BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ"),
             ObjectNullMultiple256.fabricate(4),
@@ -92,9 +90,23 @@ class ArraySingleStringTest(unittest.TestCase):
         subject = ArraySingleString.fabricate(object_id, values)
 
         self.assertEqual(subject.find_text(24), "ﾈｺﾁｬﾝ")
+        self.assertEqual(subject.find_text(18), "ｲﾇﾁｬﾝ")
+        self.assertIsNone(subject.find_text(35))
 
     def test_replace_text(self):
-        pass
+        object_id = 500
+        nekochan = BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ")
+        inuchan = BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ")
+        values = [
+            nekochan,
+            ObjectNullMultiple256.fabricate(4),
+            inuchan
+        ]
+        subject = ArraySingleString.fabricate(object_id, values)
+        subject.replace_text("ｵｼﾞｻﾝ", 24)
+
+        self.assertEqual(subject.find_text(24), "ｵｼﾞｻﾝ")
+        self.assertEqual(subject.find_text(18), "ｲﾇﾁｬﾝ")
 
     def get_all_texts(self):
         pass
