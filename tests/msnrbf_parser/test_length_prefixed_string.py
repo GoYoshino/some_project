@@ -19,7 +19,6 @@ class LengthPrefixedStringTest(unittest.TestCase):
             obj = LengthPrefixedString.from_stream(stream)
             assertEndOfStream(self, stream)
             assertEqualToStream(self, obj.raw_bytes, stream)
-            print(obj)
 
         with open("msnrbf_parser/data/uirou_uri.txt", "r", encoding="utf-8") as stream:
             uirou = stream.read()
