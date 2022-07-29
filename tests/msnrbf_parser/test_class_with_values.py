@@ -56,18 +56,6 @@ class ClassWithMembersTest(unittest.TestCase):
 
         return ClassWithValues(record_header, class_info, member_type_info, [], values)
 
-    def test_get_text_direct_child(self):
-        record_header, class_info = self.fabricate_knickknacks()
-
-        target_string = BinaryObjectString.from_params(32, "abcdefg")
-        different_string = BinaryObjectString.from_params(14, "ああああ")
-        values = ValueArray([ObjectNull(), target_string, ObjectNull(), different_string])
-        member_type_info = self.fabricate_mock_member_type_info(values)
-
-        subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
-
-        self.assertEqual(subject.find_text(32), "abcdefg")
-
     def test_has_nekochan(self):
         subject = self.fabricate_with(1001, [
             BinaryObjectString.from_params(27, "ﾈｺﾁｬﾝ"),
@@ -127,6 +115,18 @@ class ClassWithMembersTest(unittest.TestCase):
         with self.assertRaises(Exception):
             subject.find_text(27)
 
+    def test_get_text_direct_child(self):
+        record_header, class_info = self.fabricate_knickknacks()
+
+        target_string = BinaryObjectString.from_params(32, "abcdefg")
+        different_string = BinaryObjectString.from_params(14, "ああああ")
+        values = ValueArray([ObjectNull(), target_string, ObjectNull(), different_string])
+        member_type_info = self.fabricate_mock_member_type_info(values)
+
+        subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
+
+        self.assertEqual(subject.find_text(32), "abcdefg")
+
     def test_get_text_recursively(self):
         """
         直下のオブジェクトが正しく実装されたget_text()メソッドを持っている前提
@@ -145,7 +145,16 @@ class ClassWithMembersTest(unittest.TestCase):
         self.assertEqual("ﾈｺﾁｬﾝ", subject.find_text(27))
 
     def test_replace_text_direct_child(self):
-        pass
+        inuchan = BinaryObjectString.from_params(56, "ｲﾇﾁｬﾝ")
+        ojisan = BinaryObjectString.from_params(27, "ｵｼﾞｻﾝ")
+
+        subject = self.fabricate_with(120, [inuchan, ojisan])
+
+        subject.replace_text("ﾈｺﾁｬﾝ", 27)
+
+        self.assertEqual(subject.find_text(27), "ﾈｺﾁｬﾝ")
+        self.assertEqual(ojisan.get_string(), "ﾈｺﾁｬﾝ")
+        self.assertEqual(inuchan.get_string(), "ｲﾇﾁｬﾝ")
 
     def test_replace_text_recursively(self):
         pass

@@ -93,6 +93,7 @@ class ClassWithValues(Record, RecordWithValues):
             return self.get_bos_recursively(object_id).get_string()
         raise Exception(f"{self} does not have member whose objectid='{object_id}'")
 
+    # TODO: いつかシグネチャを(id, str)に変える(find_textと統一するため)。今はparseresultがテストでおおわれていないので危険
     def replace_text(self, new_string: str, object_id: int) -> None:
         if not self.has_bos_as_direct_child(object_id):
             raise Exception(f"{self} does not have member whose objectid='{object_id}'")

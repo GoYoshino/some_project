@@ -12,7 +12,6 @@ class RecordWithValues(metaclass=abc.ABCMeta):
     def get_name(self) -> str:
         raise NotImplementedError()
 
-
     def has_bos_as_direct_child(self, object_id: int) -> bool:
         raise NotImplementedError()
 
@@ -22,14 +21,11 @@ class RecordWithValues(metaclass=abc.ABCMeta):
     def get_string(self, object_id: int) -> BinaryObjectString:
         raise NotImplementedError()
 
-
     def get_direct_child_string_member_dict(self) -> Dict[int, BinaryObjectString]:
         raise NotImplementedError()
 
-
     def find_text(self, object_id: int) -> str:
         raise NotImplementedError()
-
 
     def replace_text(self, new_string: str, object_id: int) -> None:
         raise NotImplementedError()
