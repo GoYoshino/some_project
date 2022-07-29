@@ -2,7 +2,7 @@ from io import BytesIO
 import unittest
 
 from underrail_translation_kit.msnrbf_parser.primitives import Int8
-from .helper import assertEndOfStream
+from tests.msnrbf_parser.helper import assertEndOfStream
 
 class Int8Test(unittest.TestCase):
 

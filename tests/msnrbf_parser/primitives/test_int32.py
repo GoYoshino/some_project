@@ -2,7 +2,7 @@ from io import BytesIO
 import unittest
 
 from underrail_translation_kit.msnrbf_parser.primitives import Int32
-from .helper import assertEndOfStream
+from tests.msnrbf_parser.helper import assertEndOfStream
 
 class Int32Test(unittest.TestCase):
     def test_reading_stream(self):

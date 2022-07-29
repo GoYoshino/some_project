@@ -8,7 +8,7 @@ from underrail_translation_kit.msnrbf_parser.misc_record_classes import ArraySin
 from underrail_translation_kit.msnrbf_parser.object_null import ObjectNull
 from underrail_translation_kit.msnrbf_parser.primitives import Int8, RecordHeader
 from underrail_translation_kit.msnrbf_parser.serialized_object import SerializedObject
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 
 
 class ArraySingleStringTest(unittest.TestCase):

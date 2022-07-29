@@ -3,7 +3,7 @@ import unittest
 from underrail_translation_kit.msnrbf_parser.length_prefixed_string import LengthPrefixedString
 from underrail_translation_kit.msnrbf_parser.primitives import Int8
 from underrail_translation_kit.msnrbf_parser.binary_object_string import BinaryObjectString
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 
 class BinaryObjectStringTest(unittest.TestCase):
 

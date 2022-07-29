@@ -3,7 +3,7 @@ import unittest
 from underrail_translation_kit.msnrbf_parser.loaders import load_class_with_members_and_types
 from underrail_translation_kit.msnrbf_parser.primitives import RecordType, RecordHeader
 
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 
 class ClassWithMembersTest(unittest.TestCase):
 

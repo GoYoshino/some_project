@@ -3,7 +3,7 @@ from io import BytesIO
 
 from underrail_translation_kit.msnrbf_parser.enums import PrimitiveType
 from underrail_translation_kit.msnrbf_parser.primitives import KnickKnack, Int8, Int16, Int32, Double
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 from underrail_translation_kit.msnrbf_parser.loaders import _load_primitive_value
 
 

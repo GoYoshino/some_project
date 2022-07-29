@@ -5,7 +5,7 @@ import unittest
 from underrail_translation_kit.msnrbf_parser.enums import RecordType, BinaryArrayType, BinaryType
 from underrail_translation_kit.msnrbf_parser.primitives import RecordHeader
 from underrail_translation_kit.msnrbf_parser.serialized_object import SerializedObject
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 from underrail_translation_kit.msnrbf_parser.loaders import load_binary_array
 
 class BinaryArrayLoaderTest(unittest.TestCase):

@@ -2,7 +2,7 @@ from io import BytesIO
 import unittest
 
 from underrail_translation_kit.msnrbf_parser.loaders import load_class_with_members_and_types, load_class_with_id
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 
 class_info_source = b'\r\x00\x00\x00\x01P\x02\x00\x00\x00\x03P:N\x03P:V\x01\x00\x08\x02\x00\x00\x00\x06\x13\x00\x00\x00\rDamagePerTurn\x07\x00\x00\x00'
 

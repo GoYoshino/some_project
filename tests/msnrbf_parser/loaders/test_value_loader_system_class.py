@@ -2,7 +2,7 @@ from io import BytesIO
 import mock
 import unittest
 
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 from underrail_translation_kit.msnrbf_parser.loaders import _load_system_class_value
 from underrail_translation_kit.msnrbf_parser.serialized_object import SerializedObject
 

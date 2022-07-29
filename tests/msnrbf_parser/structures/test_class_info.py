@@ -1,7 +1,7 @@
 import unittest
 
 from underrail_translation_kit.msnrbf_parser.structure import ClassInfo
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 
 class ClassInfoTest(unittest.TestCase):
 

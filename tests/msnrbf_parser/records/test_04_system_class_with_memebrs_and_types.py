@@ -5,7 +5,7 @@ from underrail_translation_kit.msnrbf_parser.enums import RecordType
 from underrail_translation_kit.msnrbf_parser.loaders import load_system_class_with_members_and_types
 from underrail_translation_kit.msnrbf_parser.primitives import RecordHeader
 
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 
 class SystemClassWithMembersTest(unittest.TestCase):
 

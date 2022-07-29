@@ -3,7 +3,7 @@ import mock
 import unittest
 
 from underrail_translation_kit.msnrbf_parser.serialized_object import SerializedObject
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 from underrail_translation_kit.msnrbf_parser.loaders import _load_string_array_value
 from underrail_translation_kit.msnrbf_parser.misc_record_classes import MemberReference
 

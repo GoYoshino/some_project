@@ -2,7 +2,7 @@ import unittest
 
 from underrail_translation_kit.msnrbf_parser.primitives import Int8
 from underrail_translation_kit.msnrbf_parser.misc_record_classes import SerializationHeader
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 
 class SerializationHeaderTest(unittest.TestCase):
 

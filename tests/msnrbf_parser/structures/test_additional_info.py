@@ -2,7 +2,7 @@ import unittest
 
 from underrail_translation_kit.msnrbf_parser.structure import ClassInfo, AdditionalInfo
 from underrail_translation_kit.msnrbf_parser.serialized_object_array import BinaryTypeEnumArray
-from .helper import assertEndOfStream, assertEqualToStream
+from tests.msnrbf_parser.helper import assertEndOfStream, assertEqualToStream
 
 class ClassInfoTest(unittest.TestCase):
 
