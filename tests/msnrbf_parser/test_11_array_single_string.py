@@ -48,7 +48,7 @@ class ArraySingleStringTest(unittest.TestCase):
         expected_bytes += nekochan.raw_bytes + inuchan.raw_bytes
         self.assertEqual(subject.raw_bytes, expected_bytes)
 
-    def suspend_test_with_null_multiple(self):
+    def test_with_null_multiple(self):
         object_id = 500
         nekochan = BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ")
         inuchan = BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ")
