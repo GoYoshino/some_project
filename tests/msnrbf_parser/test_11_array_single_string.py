@@ -57,7 +57,6 @@ class ArraySingleStringTest(unittest.TestCase):
             ObjectNullMultiple256.fabricate(4),
             BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ"),
         ]
-
         subject = ArraySingleString.fabricate(object_id, values)
 
         expected_bytes = RecordHeader(RecordType.ArraySingleString).raw_bytes
@@ -81,11 +80,18 @@ class ArraySingleStringTest(unittest.TestCase):
         subject = ArraySingleString.fabricate(500, [])
         self.assertEqual(subject.get_object_id(), 500)
 
-    def test_get_string(self):
-        pass
-
     def find_text(self):
-        pass
+        object_id = 500
+        nekochan = BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ")
+        inuchan = BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ")
+        values = [
+            BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ"),
+            ObjectNullMultiple256.fabricate(4),
+            BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ"),
+        ]
+        subject = ArraySingleString.fabricate(object_id, values)
+
+        self.assertEqual(subject.find_text(24), "ﾈｺﾁｬﾝ")
 
     def test_replace_text(self):
         pass
