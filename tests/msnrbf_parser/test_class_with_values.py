@@ -63,7 +63,7 @@ class ClassWithMembersTest(unittest.TestCase):
 
         subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
 
-        self.assertEqual(subject.get_text(32), "abcdefg")
+        self.assertEqual(subject.get_text_recursively(32), "abcdefg")
 
     def test_has_nekochan(self):
         subject = self.fabricate_with([
@@ -104,7 +104,7 @@ class ClassWithMembersTest(unittest.TestCase):
         subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
 
         with self.assertRaises(Exception):
-            subject.get_text(27)
+            subject.get_text_recursively(27)
 
     def test_get_text_recursively(self):
         """
@@ -112,7 +112,7 @@ class ClassWithMembersTest(unittest.TestCase):
         """
         target_string = "ﾈｺﾁｬﾝ"
         child_object = Mock(ClassWithValues)
-        child_object.get_text.return_value = target_string
+        child_object.get_text_recursively.return_value = target_string
         child_object.has_string(27).return_vaule = True
         child_object.raw_bytes = b"nothing"
         values = ValueArray([BinaryObjectString.from_params(1, "dummy"), child_object])
@@ -121,7 +121,7 @@ class ClassWithMembersTest(unittest.TestCase):
         member_type_info = self.fabricate_mock_member_type_info(values)
 
         subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
-        self.assertEqual("ﾈｺﾁｬﾝ", subject.get_text(27))
+        self.assertEqual("ﾈｺﾁｬﾝ", subject.get_text_recursively(27))
 
     def test_replace_text_diret_child(self):
         pass
