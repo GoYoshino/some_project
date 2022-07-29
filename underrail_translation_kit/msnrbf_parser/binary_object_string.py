@@ -20,7 +20,7 @@ class BinaryObjectString(Record):
         return self.__value.string
 
     def get_length(self) -> int:
-        return self.__value.length
+        return self.__value.string_byte_length
 
     def get_object_id(self) -> int:
         return self.__object_id.value()
@@ -41,6 +41,12 @@ class BinaryObjectString(Record):
         object_id = Int32.from_stream(stream)
         value = LengthPrefixedString.from_stream(stream)
         return BinaryObjectString(record_type, object_id, value)
+
+    @staticmethod
+    def from_params(object_id: int, string: str):
+        record_type = RecordHeader(RecordType.BinaryObjectString)
+        object_id = Int32.from_value(object_id)
+        value = LengthPrefixedString.from_value(string)
 
     def __repr__(self):
         return f"BinaryString(ID={str(self.__object_id)}): {str(self.__value)}"

@@ -1,5 +1,6 @@
 from enum import Enum
-from typing import BinaryIO
+from io import BytesIO
+from typing import BinaryIO, Tuple
 import struct
 
 from .enums import RecordType
@@ -34,6 +35,7 @@ class RecordHeader(SerializedObject):
     def __repr__(self):
         return f"Header:{self.record_type.name}({hex(self.record_type.value)})"
 
+
 class Int8(SerializedObject):
 
     def __init__(self, raw_bytes: bytes):
@@ -43,12 +45,18 @@ class Int8(SerializedObject):
         return int.from_bytes(self.raw_bytes, "little")
 
     @staticmethod
+    def from_value(value: int):
+        raw_bytes = value.to_bytes(1, "little")
+        return Int32(raw_bytes)
+
+    @staticmethod
     def from_stream(stream: BinaryIO):
         raw_bytes = stream.read(1)
         return Int8(raw_bytes)
 
     def __repr__(self):
         return f"int8({self.value()})"
+
 
 class Int16(SerializedObject):
 
@@ -66,6 +74,7 @@ class Int16(SerializedObject):
     def __repr__(self):
         return f"int16({self.value()})"
 
+
 class Int32(SerializedObject):
 
     def __init__(self, raw_bytes: bytes):
@@ -75,12 +84,18 @@ class Int32(SerializedObject):
         return int.from_bytes(self.raw_bytes, "little")
 
     @staticmethod
+    def from_value(value: int):
+        raw_bytes = value.to_bytes(4, "little")
+        return Int32(raw_bytes)
+
+    @staticmethod
     def from_stream(stream: BinaryIO):
         raw_bytes = stream.read(4)
         return Int32(raw_bytes)
 
     def __repr__(self):
         return f"int32({self.value()})"
+
 
 class Double(SerializedObject):
 
@@ -97,6 +112,7 @@ class Double(SerializedObject):
     def from_stream(stream: BinaryIO):
         raw_bytes = stream.read(8)
         return Double(raw_bytes)
+
 
 class KnickKnack(SerializedObject):
     """
@@ -116,23 +132,29 @@ class KnickKnack(SerializedObject):
     def __repr__(self):
         return f"{self.__name}({self.raw_bytes})"
 
+
+def string_to_length_prefix_and_bytes(string: str) -> Tuple[bytes, bytes]:
+    string_bytes = bytes(string, "utf-8")
+    string_byte_length = len(string_bytes)
+    prefix_bytes = divide_to_7bits(string_byte_length)
+
+    return (prefix_bytes, string_bytes)
+
+
+# TODO: is this really "primitive"?
 class LengthPrefixedString(SerializedObject):
 
-    def __init__(self, raw_bytes: bytes, length: int, string: str):
+    def __init__(self, raw_bytes: bytes, byte_length: int, string: str):
         super().__init__(raw_bytes)
-        self.length = length
+        self.string_byte_length = byte_length
         self.string = string
 
     def replace_string(self, string: str) -> None:
         string = lf_to_crlf(string)
-        new_string_bytes = bytes(string, "utf-8")
-        byte_length = len(new_string_bytes)
-
-        prefix_bytes = divide_to_7bits(byte_length)
-
-        self.raw_bytes = prefix_bytes + new_string_bytes
+        prefix_bytes, string_bytes = string_to_length_prefix_and_bytes(string)
+        self.raw_bytes = prefix_bytes + string_bytes
+        self.string_byte_length = len(string_bytes)
         self.string = string
-        self.length = byte_length
 
     @staticmethod
     def from_stream(stream: BinaryIO):
@@ -146,13 +168,18 @@ class LengthPrefixedString(SerializedObject):
             if new_byte[0] & 0b10000000 == 0:
                 break
 
-        string_length = concat_7bits(length_byte_list)
+        string_byte_length = concat_7bits(length_byte_list)
 
-        section_string = stream.read(string_length)
+        section_string = stream.read(string_byte_length)
         string = section_string.decode("utf-8")
 
         raw_bytes = raw_length_bytes + section_string
-        return LengthPrefixedString(raw_bytes, string_length, string)
+        return LengthPrefixedString(raw_bytes, string_byte_length, string)
+
+    @staticmethod
+    def from_value(string: str):
+        prefix, string_bytes = string_to_length_prefix_and_bytes(string)
+        return LengthPrefixedString(prefix + string_bytes, len(string_bytes), string)
 
     def __repr__(self):
-        return f"{self.string}[{self.length}]"
+        return f"{self.string}[{self.string_byte_length}]"

@@ -12,9 +12,9 @@ class LengthPrefixedStringTest(unittest.TestCase):
             assertEqualToStream(self, obj.raw_bytes, stream)
 
         self.assertEqual(obj.string, "This is the internal currency of the South Gate Station.")
-        self.assertEqual(obj.length, 56)
+        self.assertEqual(obj.string_byte_length, 56)
 
-    def works_on_loooong_text(self):
+    def test_works_on_loooong_text(self):
         with open("msnrbf_parser/data/uirou_uri", "rb") as stream:
             obj = LengthPrefixedString.from_stream(stream)
             assertEndOfStream(self, stream)
@@ -22,8 +22,15 @@ class LengthPrefixedStringTest(unittest.TestCase):
             print(obj)
 
         with open("msnrbf_parser/data/uirou_uri.txt", "r", encoding="utf-8") as stream:
-            self.assertEqual(obj.string, stream.read())
-            self.assertEqual(obj.length, 2934)
+            uirou = stream.read()
+            self.assertEqual(obj.string, uirou)
+            self.assertEqual(obj.string_byte_length, len(uirou.encode("utf-8")))
+
+    def test_direct_generation(self):
+        obj = LengthPrefixedString.from_value("abcdefgggg")
+        self.assertEqual("abcdefgggg", obj.string)
+        self.assertEqual(len("abcdefgggg".encode("utf-8")), obj.string_byte_length)
+        self.assertEqual(b"\x0Aabcdefgggg", obj.raw_bytes)
 
 if __name__ == '__main__':
     unittest.main()
