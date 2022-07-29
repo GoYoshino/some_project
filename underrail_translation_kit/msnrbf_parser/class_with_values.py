@@ -60,29 +60,29 @@ class ClassWithValues(Record, RecordWithValues):
     def get_name(self):
         return self.__meta_class_info.get_name()
 
-    def has_string_member(self, object_id: int) -> bool:
+    def has_string(self, object_id: int) -> bool:
         return object_id in self.__string_member_dictionary.keys()
 
-    def get_string_member(self, object_id: int) -> BinaryObjectString:
+    def get_string(self, object_id: int) -> BinaryObjectString:
         return self.__string_member_dictionary[object_id]
 
-    def get_string_member_dict(self) -> Dict[int, BinaryObjectString]:
+    def get_direct_child_string_member_dict(self) -> Dict[int, BinaryObjectString]:
         return self.__string_member_dictionary
 
     def get_text(self, object_id: int) -> str:
-        if self.has_string_member(object_id):
-            return self.get_string_member(object_id).get_string()
+        if self.has_string(object_id):
+            return self.get_string(object_id).get_string()
 
         for member_record_with_value in self.__record_with_value_dictionary.values():
-            if member_record_with_value.has_string_member(object_id):
+            if member_record_with_value.has_string(object_id):
                 return member_record_with_value.get_text(object_id)
 
         raise Exception(f"{self} does not have member whose objectid='{object_id}'")
 
     def replace_text(self, new_string: str, object_id: int) -> None:
-        if not self.has_string_member(object_id):
+        if not self.has_string(object_id):
             raise Exception(f"{self} does not have member whose objectid='{object_id}'")
-        self.get_string_member(object_id).replace_string(new_string)
+        self.get_string(object_id).replace_string(new_string)
 
     def get_class_info_tuple(self) -> Tuple[ClassInfo, MemberTypeInfo]:
         return (self.__meta_class_info, self.__meta_member_type_info)

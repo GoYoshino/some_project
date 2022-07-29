@@ -39,6 +39,20 @@ class ClassWithMembersTest(unittest.TestCase):
 
         return record_header, class_info
 
+    def fabricate_with(self, bos_list: List[BinaryObjectString]) -> ClassWithValues:
+        record_header, class_info = self.fabricate_knickknacks()
+
+        members = []
+        for bos in bos_list:
+            members.append(ObjectNull())    # テストのため要らんオブジェクトを挿入
+            members.append(bos)
+            members.append(ObjectNull())
+
+        values = ValueArray(members)
+        member_type_info = self.fabricate_mock_member_type_info(values)
+
+        return ClassWithValues(record_header, class_info, member_type_info, [], values)
+
     def test_get_text_direct_child(self):
         record_header, class_info = self.fabricate_knickknacks()
 
@@ -51,7 +65,36 @@ class ClassWithMembersTest(unittest.TestCase):
 
         self.assertEqual(subject.get_text(32), "abcdefg")
 
+    def test_has_nekochan(self):
+        subject = self.fabricate_with([
+            BinaryObjectString.from_params(27, "ﾈｺﾁｬﾝ"),
+            BinaryObjectString.from_params(32, "ｲﾇﾁｬﾝ"),
+            BinaryObjectString.from_params(14, "ｶﾜｳｿﾁｬﾝ")
+        ])
+
+        self.assertTrue(subject.has_string(27))
+
+    def suspend_test_has_nekochan_in_child(self):
+        nekochan_cage = Mock(ClassWithValues)
+        nekochan_cage.has_string.return_value = True
+        nekochan_cage.raw_bytes = b"neko"
+        subject = self.fabricate_with([
+            nekochan_cage,
+            BinaryObjectString.from_params(32, "ｲﾇﾁｬﾝ"),
+            BinaryObjectString.from_params(14, "ｶﾜｳｿﾁｬﾝ")
+        ])
+
+        self.assertTrue(subject.has_string(27))
+
     def test_no_nekochan(self):
+        subject = self.fabricate_with([
+            BinaryObjectString.from_params(32, "ｲﾇﾁｬﾝ"),
+            BinaryObjectString.from_params(14, "ｶﾜｳｿﾁｬﾝ")
+        ])
+
+        self.assertFalse(subject.has_string(27))
+
+    def test_i_SAID_no_nekochan(self):
         record_header, class_info = self.fabricate_knickknacks()
 
         inu = BinaryObjectString.from_params(32, "ｲﾇﾁｬﾝ")
@@ -63,7 +106,6 @@ class ClassWithMembersTest(unittest.TestCase):
         with self.assertRaises(Exception):
             subject.get_text(27)
 
-
     def test_get_text_recursively(self):
         """
         直下のオブジェクトが正しく実装されたget_text()メソッドを持っている前提
@@ -71,7 +113,7 @@ class ClassWithMembersTest(unittest.TestCase):
         target_string = "ﾈｺﾁｬﾝ"
         child_object = Mock(ClassWithValues)
         child_object.get_text.return_value = target_string
-        child_object.has_string_member(27).return_vaule = True
+        child_object.has_string(27).return_vaule = True
         child_object.raw_bytes = b"nothing"
         values = ValueArray([BinaryObjectString.from_params(1, "dummy"), child_object])
 

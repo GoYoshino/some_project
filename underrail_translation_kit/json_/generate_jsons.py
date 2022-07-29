@@ -42,7 +42,7 @@ def generate_whole_extract_json(obj: ParseResult) -> List[Dict[str, str]]:
     classes = obj.get_all_member_class()
     for key in classes:
         class_ = classes[key]
-        members = class_.get_string_member_dict()
+        members = class_.get_direct_child_string_member_dict()
         for member_key in members:
             member = members[member_key]
             path = f"{key}.{member_key}"

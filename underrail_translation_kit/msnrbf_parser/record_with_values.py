@@ -13,15 +13,15 @@ class RecordWithValues(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
 
-    def has_string_member(self, object_id: int) -> bool:
+    def has_string(self, object_id: int) -> bool:
         raise NotImplementedError()
 
 
-    def get_string_member(self, object_id: int) -> BinaryObjectString:
+    def get_string(self, object_id: int) -> BinaryObjectString:
         raise NotImplementedError()
 
 
-    def get_string_member_dict(self) -> Dict[int, BinaryObjectString]:
+    def get_direct_child_string_member_dict(self) -> Dict[int, BinaryObjectString]:
         raise NotImplementedError()
 
 
