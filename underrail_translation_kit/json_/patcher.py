@@ -38,6 +38,10 @@ def __apply_json_to_object(object: ParseResult, json_data: List[Dict[str, str]])
 
     for data in json_data:
 
+        # ignores jsonversion
+        if "jsonVersion" in data:
+            continue
+
         # Does nothing translatedText is empty(to avoid breaking key)
         if data["translatedText"] == "":
             continue

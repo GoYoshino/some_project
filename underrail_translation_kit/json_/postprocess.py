@@ -8,11 +8,19 @@ def __postprocess(json_object: Dict[str, str]) -> bool:
     :return: False if the entry should be deleted
     """
 
-    # 1. avoid value: "English" entries spam
-    if json_object["originalText"] == "English" and json_object["classInfo"][:9] == ".DM.DM:LL":
+    # avoid empty values
+    if json_object["originalText"] == "":
         return False
 
-    # 2. avoid elements suffixed with something like "(301db70e-7a5a-40db-a103-21e6927c1834)"
+    # avoid value: "English" entries spam
+    if json_object["originalText"] == "English" or json_object["originalText"] == "Serbian":
+        return False
+
+    # avoid ".DM.DM:DN" and ".DM.DM:DD"
+    if json_object["classInfo"][:9] == ".DM.DM:DN" or ["classInfo"][:9] == ".DM.DM:DD":
+        return False
+
+    # avoid elements suffixed with something like "(301db70e-7a5a-40db-a103-21e6927c1834)"
     if re.search(r"[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}", json_object["originalText"]):
         return False
 

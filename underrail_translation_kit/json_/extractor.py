@@ -26,7 +26,7 @@ def __generate_json_dictionary(class_info: str, object_id: int, original_text: s
     }
 
 def __extract_from_a_object(obj: ParseResult) -> List[Dict[str, str]]:
-    json_dict_list = [ { "jsonVersion": JSON_VERSION } ]
+    json_dict_list = []
 
     texts = obj.get_all_texts()
     for index in texts:
@@ -54,6 +54,7 @@ def extract(underrail_root: str, json_root: str, dry_mode=True):
         object = __load_object(path.datafile())
         json_data = __extract_from_a_object(object)
         json_data = postprocess(json_data)
+        json_data.append({ "jsonVersion": JSON_VERSION })
 
         if not dry_mode:
             os.makedirs(path.json_dir(), exist_ok=True)
