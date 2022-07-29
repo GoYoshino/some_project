@@ -42,8 +42,14 @@ class ClassWithValues(Record, RecordWithValues):
         for i, binary_type in enumerate(binary_type_list):
             if binary_type == BinaryType.Class:
                 item = self.__values.get_item(i)
+
                 if not isinstance(item, RecordWithValues):
                     continue
+                try:
+                    item.get_object_id()
+                except:
+                    raise Exception(f"this {RecordWithValues.__name__} does not implement object_id() method:" + str(item))
+
                 record_with_value_dictionary[item.get_object_id()] = item
 
             elif binary_type == BinaryType.String:
@@ -95,9 +101,9 @@ class ClassWithValues(Record, RecordWithValues):
 
     # TODO: いつかシグネチャを(id, str)に変える(find_textと統一するため)。今はparseresultがテストでおおわれていないので危険
     def replace_text(self, new_string: str, object_id: int) -> None:
-        if not self.has_bos_as_direct_child(object_id):
+        if not self.has_bos_recursively(object_id):
             raise Exception(f"{self} does not have member whose objectid='{object_id}'")
-        self.get_string(object_id).replace_string(new_string)
+        self.get_bos_recursively(object_id).replace_string(new_string)
 
     def get_class_info_tuple(self) -> Tuple[ClassInfo, MemberTypeInfo]:
         return (self.__meta_class_info, self.__meta_member_type_info)

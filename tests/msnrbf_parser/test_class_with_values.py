@@ -4,10 +4,11 @@ from mock import Mock
 import unittest
 
 from underrail_translation_kit.msnrbf_parser.binary_object_string import BinaryObjectString
+from underrail_translation_kit.msnrbf_parser.class_with_members_and_types import ClassWithMembersAndTypes
 from underrail_translation_kit.msnrbf_parser.class_with_values import ClassWithValues
 from underrail_translation_kit.msnrbf_parser.enums import BinaryType
 from underrail_translation_kit.msnrbf_parser.object_null import ObjectNull
-from underrail_translation_kit.msnrbf_parser.primitives import RecordType, RecordHeader
+from underrail_translation_kit.msnrbf_parser.primitives import RecordType, RecordHeader, Int32
 from underrail_translation_kit.msnrbf_parser.serialized_object import SerializedObject
 from underrail_translation_kit.msnrbf_parser.structure import ClassInfo, MemberTypeInfo
 from underrail_translation_kit.msnrbf_parser.value_array import ValueArray
@@ -15,6 +16,7 @@ from underrail_translation_kit.msnrbf_parser.value_array import ValueArray
 
 class ClassWithMembersTest(unittest.TestCase):
 
+    # TODO: 汚いテストを書き直す
     def fabricate_mock_member_type_info(self, values: ValueArray) -> MemberTypeInfo:
         result: List[BinaryType] = []
         for value in values.items:
@@ -40,21 +42,16 @@ class ClassWithMembersTest(unittest.TestCase):
 
         return record_header, class_info
 
-    def fabricate_with(self, object_id: int, bos_list: List[SerializedObject]) -> ClassWithValues:
+    def fabricate_with(self, object_id: int, value_list: List[SerializedObject]) -> ClassWithValues:
         record_header, class_info = self.fabricate_knickknacks()
 
-        members = []
-        for bos in bos_list:
-            members.append(ObjectNull())    # テストのため要らんオブジェクトを挿入
-            members.append(bos)
-            members.append(ObjectNull())
-
-        values = ValueArray(members)
+        values = ValueArray(value_list)
         class_info = Mock(ClassInfo)
         class_info.get_object_id.return_value = object_id
+        class_info.raw_bytes = b"mockclassinfo"
         member_type_info = self.fabricate_mock_member_type_info(values)
 
-        return ClassWithValues(record_header, class_info, member_type_info, [], values)
+        return ClassWithMembersAndTypes(record_header, class_info, member_type_info, Int32.from_value(1), values)
 
     def test_has_nekochan(self):
         subject = self.fabricate_with(1001, [
@@ -103,6 +100,7 @@ class ClassWithMembersTest(unittest.TestCase):
 
         self.assertFalse(subject.has_bos_as_direct_child(27))
 
+    # TODO: あとでけす　directchildかそうでないかの区別は不要
     def test_i_SAID_no_nekochan(self):
         record_header, class_info = self.fabricate_knickknacks()
 
@@ -127,6 +125,10 @@ class ClassWithMembersTest(unittest.TestCase):
 
         self.assertEqual(subject.find_text(32), "abcdefg")
 
+    def test_get_text_from_member_array(self):
+        # 今の実装だとArrayがメンバのときは動かないはず
+        pass
+
     def test_get_text_recursively(self):
         """
         直下のオブジェクトが正しく実装されたget_text()メソッドを持っている前提
@@ -135,7 +137,7 @@ class ClassWithMembersTest(unittest.TestCase):
         child_object = Mock(ClassWithValues)
         child_object.has_bos_recursively.return_value = True
         child_object.get_bos_recursively.return_value = target
-        child_object.raw_bytes = b"nothing"
+        child_object.raw_bytes = b"mock_class_with_values"
         values = ValueArray([BinaryObjectString.from_params(1, "dummy"), child_object])
 
         record_header, class_info = self.fabricate_knickknacks()
@@ -157,6 +159,23 @@ class ClassWithMembersTest(unittest.TestCase):
         self.assertEqual(inuchan.get_string(), "ｲﾇﾁｬﾝ")
 
     def test_replace_text_recursively(self):
+        inuchan = BinaryObjectString.from_params(56, "ｲﾇﾁｬﾝ")
+        ojisan = BinaryObjectString.from_params(27, "ｵｼﾞｻﾝ")
+        cage = self.fabricate_with(555, [
+            inuchan,
+            ojisan
+        ])
+        assert cage.get_object_id() == 555
+
+        subject = self.fabricate_with(1200, [cage])
+
+        subject.replace_text("ﾈｺﾁｬﾝ", 27)
+
+        self.assertEqual(subject.find_text(27), "ﾈｺﾁｬﾝ")
+        self.assertEqual(ojisan.get_string(), "ﾈｺﾁｬﾝ")
+        self.assertEqual(inuchan.get_string(), "ｲﾇﾁｬﾝ")
+
+    def test_get_all_texts(self):
         pass
 
 if __name__ == '__main__':
