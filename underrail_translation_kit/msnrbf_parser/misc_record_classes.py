@@ -149,12 +149,26 @@ class ArraySingleString(Record, RecordWithValues):
 
     @staticmethod
     def fabricate(object_id: int, values: List[BinaryObjectString]):
+        """
+        純粋なテスト目的
+        XXX: NullObjectMultiple系が混ざっているとこのメソッドは正しく動作しない
+        :param object_id:
+        :param values:
+        :return:
+        """
         dictionary = {}
+        length = 0
         for value in values:
-            dictionary[value.get_object_id()] = value
+            if isinstance(value, BinaryObjectString):
+                dictionary[value.get_object_id()] = value
+            if isinstance(value, ObjectNullMultiple256):
+                length += value.get_count()
+            else:
+                length += 1
+
         return ArraySingleString(
             RecordHeader(RecordType.ArraySingleString),
-            ArrayInfo(Int32.from_value(object_id), Int32.from_value(len(values))),
+            ArrayInfo(Int32.from_value(object_id), Int32.from_value(length)),
             SerializedObjectArray(values),
             dictionary
         )
@@ -207,4 +221,10 @@ class ObjectNullMultiple256(Record):
     def from_stream(stream: BinaryIO):
         record_type = RecordHeader(RecordType.ObjectNullMultiple256)
         null_count = Int8.from_stream(stream)
+        return ObjectNullMultiple256(record_type, null_count)
+
+    @staticmethod
+    def fabricate(null_count: int):
+        record_type = RecordHeader(RecordType.ObjectNullMultiple256)
+        null_count = Int8.from_value(null_count)
         return ObjectNullMultiple256(record_type, null_count)
