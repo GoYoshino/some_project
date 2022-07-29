@@ -1,6 +1,6 @@
 import unittest
 
-from underrail_translation_kit.msnrbf_parser.primitives import LengthPrefixedString
+from underrail_translation_kit.msnrbf_parser.length_prefixed_string import LengthPrefixedString
 from .helper import assertEndOfStream, assertEqualToStream
 
 class LengthPrefixedStringTest(unittest.TestCase):

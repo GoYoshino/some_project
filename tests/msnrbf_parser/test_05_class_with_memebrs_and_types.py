@@ -16,7 +16,5 @@ class ClassWithMembersTest(unittest.TestCase):
             assertEndOfStream(self, stream)
             assertEqualToStream(self, obj.raw_bytes, stream)
 
-        # TODO: 読み書きメソッドのテスト
-
 if __name__ == '__main__':
     unittest.main()

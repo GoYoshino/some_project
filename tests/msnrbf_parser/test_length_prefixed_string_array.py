@@ -1,6 +1,6 @@
 import unittest
 
-from underrail_translation_kit.msnrbf_parser.primitives import LengthPrefixedString
+from underrail_translation_kit.msnrbf_parser.length_prefixed_string import LengthPrefixedString
 from underrail_translation_kit.msnrbf_parser.serialized_object_array import LengthPrefixedStringArray
 from .helper import assertEndOfStream, assertEqualToStream
 

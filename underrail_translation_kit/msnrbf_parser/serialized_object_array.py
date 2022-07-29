@@ -1,7 +1,8 @@
 from typing import List, BinaryIO
 
 from .enums import BinaryType
-from .primitives import Int8, LengthPrefixedString
+from .primitives import Int8
+from .length_prefixed_string import LengthPrefixedString
 from .serialized_object import SerializedObject
 
 

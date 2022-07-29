@@ -4,7 +4,8 @@ from underrail_translation_kit.msnrbf_parser.record_with_values import RecordWit
 from .binary_object_string import BinaryObjectString
 from .enums import RecordType
 from .object_null import ObjectNull
-from .primitives import Int8, Int32, RecordHeader, LengthPrefixedString, KnickKnack, NoneObject
+from .length_prefixed_string import LengthPrefixedString
+from .primitives import Int8, Int32, RecordHeader, KnickKnack
 from .record import Record
 from .serialized_object import SerializedObject
 from .serialized_object_array import SerializedObjectArray

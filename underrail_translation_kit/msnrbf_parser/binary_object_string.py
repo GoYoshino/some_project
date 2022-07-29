@@ -1,8 +1,9 @@
 from typing import BinaryIO
 
 from .enums import RecordType
+from .length_prefixed_string import LengthPrefixedString
+from .primitives import Int32, RecordHeader
 from .record import Record
-from .primitives import LengthPrefixedString, Int8, Int32, RecordHeader
 
 class BinaryObjectString(Record):
     """
@@ -44,9 +45,10 @@ class BinaryObjectString(Record):
 
     @staticmethod
     def from_params(object_id: int, string: str):
-        record_type = RecordHeader(RecordType.BinaryObjectString)
+        record_header = RecordHeader(RecordType.BinaryObjectString)
         object_id = Int32.from_value(object_id)
         value = LengthPrefixedString.from_value(string)
+        return BinaryObjectString(record_header, object_id, value)
 
     def __repr__(self):
         return f"BinaryString(ID={str(self.__object_id)}): {str(self.__value)}"

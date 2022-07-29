@@ -55,7 +55,7 @@ class ParseResult(SerializedObjectArray):
         result = {}
         for i, item in enumerate(self.items):
             if isinstance(item, RecordWithValues):
-                result.update(item.get_all_texts())
+                result.update(item.get_all_texts(""))
             elif isinstance(item, BinaryObjectString):
                 result[item.get_object_id()] = item
 
