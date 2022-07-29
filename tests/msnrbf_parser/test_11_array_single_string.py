@@ -77,7 +77,7 @@ class ArraySingleStringTest(unittest.TestCase):
             assertEndOfStream(self, stream)
             assertEqualToStream(self, obj.raw_bytes, stream)
 
-    def suspend_test_get_object_id(self):
+    def test_get_object_id(self):
         subject = ArraySingleString.fabricate(500, [])
         self.assertEqual(subject.get_object_id(), 500)
 

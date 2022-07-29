@@ -126,7 +126,7 @@ class ArrayInfo(SerializedObjectArray):
         return self.__length.value()
 
     def get_object_id(self):
-        return self.__object_id
+        return self.__object_id.value()
 
     @staticmethod
     def from_stream(stream: BinaryIO):
