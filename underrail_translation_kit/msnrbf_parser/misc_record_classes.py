@@ -177,9 +177,6 @@ class ArraySingleString(Record, RecordWithValues):
     def get_object_id(self) -> int:
         return self.__array_info.get_object_id()
 
-    def get_name(self):
-        return "array"
-
     def has_bos_as_direct_child(self, object_id: int) -> bool:
         return object_id in self.__string_values_dict.keys()
 

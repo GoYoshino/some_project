@@ -9,9 +9,6 @@ class RecordWithValues(metaclass=abc.ABCMeta):
     def get_object_id(self) -> int:
         raise NotImplementedError()
 
-    def get_name(self) -> str:
-        raise NotImplementedError()
-
     def has_bos_as_direct_child(self, object_id: int) -> bool:
         raise NotImplementedError()
 

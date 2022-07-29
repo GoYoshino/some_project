@@ -20,9 +20,5 @@ class SystemClassWithMembersAndTypes(Record):
     def __repr__(self):
         return f"SystemClassWithMembersAndTypes: [{str(self.__class_info)}, {str(self.__member_type_info)}, values={str(self.__values)}]"
 
-
-    def get_name(self) -> str:
-        return self.__class_info.get_name()
-
     def get_class_info_tuple(self) -> Tuple[ClassInfo, MemberTypeInfo]:
         return (self.__class_info, self.__member_type_info)

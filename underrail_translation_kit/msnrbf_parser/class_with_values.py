@@ -63,9 +63,6 @@ class ClassWithValues(Record, RecordWithValues):
         self.__string_member_dictionary = string_dictionary
         self.__record_with_value_dictionary = record_with_value_dictionary
 
-    def get_name(self):
-        return self.__meta_class_info.get_name()
-
     # TODO: 消す　意味がない　依存を外してから
     def has_bos_as_direct_child(self, object_id: int) -> bool:
         return object_id in self.__string_member_dictionary.keys()

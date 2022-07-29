@@ -81,9 +81,6 @@ class ArraySingleStringTest(unittest.TestCase):
         subject = ArraySingleString.fabricate(500, [])
         self.assertEqual(subject.get_object_id(), 500)
 
-    def test_get_name(self):
-        pass
-
     def test_get_string(self):
         pass
 
