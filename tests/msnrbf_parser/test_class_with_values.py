@@ -8,6 +8,7 @@ from underrail_translation_kit.msnrbf_parser.class_with_values import ClassWithV
 from underrail_translation_kit.msnrbf_parser.enums import BinaryType
 from underrail_translation_kit.msnrbf_parser.object_null import ObjectNull
 from underrail_translation_kit.msnrbf_parser.primitives import RecordType, RecordHeader
+from underrail_translation_kit.msnrbf_parser.serialized_object import SerializedObject
 from underrail_translation_kit.msnrbf_parser.structure import ClassInfo, MemberTypeInfo
 from underrail_translation_kit.msnrbf_parser.value_array import ValueArray
 
@@ -39,7 +40,7 @@ class ClassWithMembersTest(unittest.TestCase):
 
         return record_header, class_info
 
-    def fabricate_with(self, bos_list: List[BinaryObjectString]) -> ClassWithValues:
+    def fabricate_with(self, object_id: int, bos_list: List[SerializedObject]) -> ClassWithValues:
         record_header, class_info = self.fabricate_knickknacks()
 
         members = []
@@ -49,6 +50,8 @@ class ClassWithMembersTest(unittest.TestCase):
             members.append(ObjectNull())
 
         values = ValueArray(members)
+        class_info = Mock(ClassInfo)
+        class_info.get_object_id.return_value = object_id
         member_type_info = self.fabricate_mock_member_type_info(values)
 
         return ClassWithValues(record_header, class_info, member_type_info, [], values)
@@ -66,7 +69,7 @@ class ClassWithMembersTest(unittest.TestCase):
         self.assertEqual(subject.get_text_recursively(32), "abcdefg")
 
     def test_has_nekochan(self):
-        subject = self.fabricate_with([
+        subject = self.fabricate_with(1001, [
             BinaryObjectString.from_params(27, "ﾈｺﾁｬﾝ"),
             BinaryObjectString.from_params(32, "ｲﾇﾁｬﾝ"),
             BinaryObjectString.from_params(14, "ｶﾜｳｿﾁｬﾝ")
@@ -74,20 +77,38 @@ class ClassWithMembersTest(unittest.TestCase):
 
         self.assertTrue(subject.has_bos_as_direct_child(27))
 
-    def suspend_test_has_nekochan_in_child(self):
+    def test_has_nekochan_in_child(self):
         nekochan_cage = Mock(ClassWithValues)
         nekochan_cage.has_bos_as_direct_child.return_value = True
+        nekochan_cage.get_bos_recursively.return_value = BinaryObjectString.from_params(27, "ﾈｺﾁｬﾝ")
+        nekochan_cage.get_object_id.return_value = 1001
         nekochan_cage.raw_bytes = b"neko"
-        subject = self.fabricate_with([
+        subject = self.fabricate_with(1002, [
             nekochan_cage,
             BinaryObjectString.from_params(32, "ｲﾇﾁｬﾝ"),
             BinaryObjectString.from_params(14, "ｶﾜｳｿﾁｬﾝ")
         ])
 
-        self.assertTrue(subject.has_bos_as_direct_child(27))
+        self.assertFalse(subject.has_bos_as_direct_child(27))
+        self.assertTrue(subject.has_bos_recursively(27))
+
+    def test_get_nekochan_the_grandson(self):
+        nekochan_cage = Mock(ClassWithValues)
+        nekochan_cage.has_bos_as_direct_child.return_value = True
+        nekochan_cage.raw_bytes = b"Nekochan_The_Grandson"
+        nekochan_cage.get_bos_recursively.return_value = BinaryObjectString.from_params(27, "Nekochan The Grandson")
+        nekochan_cage.get_object_id.return_value = 1001
+
+        nekochan_house = self.fabricate_with(1002, [
+            nekochan_cage,
+            BinaryObjectString.from_params(33, "カリカリ")
+        ])
+
+        self.assertFalse(nekochan_house.has_bos_as_direct_child(27))
+        self.assertTrue(nekochan_house.has_bos_recursively(27))
 
     def test_no_nekochan(self):
-        subject = self.fabricate_with([
+        subject = self.fabricate_with(1000, [
             BinaryObjectString.from_params(32, "ｲﾇﾁｬﾝ"),
             BinaryObjectString.from_params(14, "ｶﾜｳｿﾁｬﾝ")
         ])

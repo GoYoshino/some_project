@@ -16,6 +16,8 @@ class RecordWithValues(metaclass=abc.ABCMeta):
     def has_bos_as_direct_child(self, object_id: int) -> bool:
         raise NotImplementedError()
 
+    def get_bos_recursively(self, object_id: int) -> BinaryObjectString:
+        raise NotImplementedError()
 
     def get_string(self, object_id: int) -> BinaryObjectString:
         raise NotImplementedError()

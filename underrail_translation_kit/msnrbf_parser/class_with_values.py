@@ -1,5 +1,5 @@
 import abc
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 from underrail_translation_kit.msnrbf_parser.binary_object_string import BinaryObjectString
 from underrail_translation_kit.msnrbf_parser.enums import BinaryType
@@ -62,6 +62,23 @@ class ClassWithValues(Record, RecordWithValues):
 
     def has_bos_as_direct_child(self, object_id: int) -> bool:
         return object_id in self.__string_member_dictionary.keys()
+
+    def has_bos_recursively(self, object_id: int) -> bool:
+        result = self.get_bos_recursively(object_id)
+        return not result is None
+
+    def get_bos_recursively(self, object_id: int) -> Optional[BinaryObjectString]:
+        for value in self.__values.items:
+            if isinstance(value, RecordWithValues):
+                local_result = value.get_bos_recursively(object_id)
+                if local_result is not None:
+                    return local_result
+
+            elif isinstance(value, BinaryObjectString):
+                if value.get_object_id() == object_id:
+                    return value
+
+        return None
 
     def get_string(self, object_id: int) -> BinaryObjectString:
         return self.__string_member_dictionary[object_id]
