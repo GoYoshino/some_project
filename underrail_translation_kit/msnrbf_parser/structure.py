@@ -122,10 +122,10 @@ class ArrayInfo(SerializedObjectArray):
         self.__length = length
         self.__object_id = object_id
 
-    def get_length(self):
+    def get_length(self) -> int:
         return self.__length.value()
 
-    def get_object_id(self):
+    def get_object_id(self) -> int:
         return self.__object_id.value()
 
     @staticmethod
