@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from mock import Mock
 import unittest
@@ -21,6 +21,8 @@ class ClassWithMembersTest(unittest.TestCase):
                 result.append(BinaryType.String)
             elif isinstance(value, ObjectNull):
                 result.append(BinaryType.Object)
+            elif isinstance(value, ClassWithValues):
+                result.append(BinaryType.Class)
             else:
                 self.fail(f"not implemented for object: {value}")
 
@@ -30,21 +32,54 @@ class ClassWithMembersTest(unittest.TestCase):
 
         return member_type_info
 
-    def test_get_text_direct_child(self):
+    def fabricate_knickknacks(self) -> Tuple[RecordHeader, ClassInfo]:
         record_header = RecordHeader(RecordType.ClassWithMembersAndTypes)
         class_info = Mock(ClassInfo)
         class_info.raw_bytes = "いんふぉ".encode("utf-8")
 
+        return record_header, class_info
+
+    def test_get_text_direct_child(self):
+        record_header, class_info = self.fabricate_knickknacks()
+
         target_string = BinaryObjectString.from_params(32, "abcdefg")
-        values = ValueArray([ObjectNull(), target_string, ObjectNull()])
+        different_string = BinaryObjectString.from_params(14, "ああああ")
+        values = ValueArray([ObjectNull(), target_string, ObjectNull(), different_string])
         member_type_info = self.fabricate_mock_member_type_info(values)
 
         subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
 
-        self.assertEqual("abcdefg", subject.get_text(32))
+        self.assertEqual(subject.get_text(32), "abcdefg")
+
+    def test_no_nekochan(self):
+        record_header, class_info = self.fabricate_knickknacks()
+
+        inu = BinaryObjectString.from_params(32, "ｲﾇﾁｬﾝ")
+        kawauso = BinaryObjectString.from_params(14, "ｶﾜｳｿﾁｬﾝ")
+        values = ValueArray([ObjectNull(), inu, kawauso ])
+        member_type_info = self.fabricate_mock_member_type_info(values)
+        subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
+
+        with self.assertRaises(Exception):
+            subject.get_text(27)
+
 
     def test_get_text_recursively(self):
-        pass
+        """
+        直下のオブジェクトが正しく実装されたget_text()メソッドを持っている前提
+        """
+        target_string = "ﾈｺﾁｬﾝ"
+        child_object = Mock(ClassWithValues)
+        child_object.get_text.return_value = target_string
+        child_object.has_string_member(27).return_vaule = True
+        child_object.raw_bytes = b"nothing"
+        values = ValueArray([BinaryObjectString.from_params(1, "dummy"), child_object])
+
+        record_header, class_info = self.fabricate_knickknacks()
+        member_type_info = self.fabricate_mock_member_type_info(values)
+
+        subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
+        self.assertEqual("ﾈｺﾁｬﾝ", subject.get_text(27))
 
     def test_replace_text_diret_child(self):
         pass

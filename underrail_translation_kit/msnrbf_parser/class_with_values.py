@@ -70,9 +70,14 @@ class ClassWithValues(Record, RecordWithValues):
         return self.__string_member_dictionary
 
     def get_text(self, object_id: int) -> str:
-        if not self.has_string_member(object_id):
-            raise Exception(f"{self} does not have member whose objectid='{object_id}'")
-        return self.get_string_member(object_id).get_string()
+        if self.has_string_member(object_id):
+            return self.get_string_member(object_id).get_string()
+
+        for member_record_with_value in self.__record_with_value_dictionary.values():
+            if member_record_with_value.has_string_member(object_id):
+                return member_record_with_value.get_text(object_id)
+
+        raise Exception(f"{self} does not have member whose objectid='{object_id}'")
 
     def replace_text(self, new_string: str, object_id: int) -> None:
         if not self.has_string_member(object_id):
