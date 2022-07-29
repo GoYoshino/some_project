@@ -68,7 +68,7 @@ class ArraySingleStringTest(unittest.TestCase):
         expected_bytes += inuchan.raw_bytes
         self.assertEqual(subject.raw_bytes, expected_bytes)
 
-    def suspend_test_reading_stream(self):
+    def test_reading_stream(self):
         with open("msnrbf_parser/data/11_ArraySingleString", "rb") as stream:
             header = Int8.from_stream(stream)
             self.assertEqual(header.raw_bytes, b"\x11")
