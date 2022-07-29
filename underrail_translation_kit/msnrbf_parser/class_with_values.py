@@ -60,6 +60,7 @@ class ClassWithValues(Record, RecordWithValues):
     def get_name(self):
         return self.__meta_class_info.get_name()
 
+    # TODO: 消す　意味がない　依存を外してから
     def has_bos_as_direct_child(self, object_id: int) -> bool:
         return object_id in self.__string_member_dictionary.keys()
 
@@ -80,6 +81,7 @@ class ClassWithValues(Record, RecordWithValues):
 
         return None
 
+    # TODO: 消す　先に他のメソッドの依存を外してから
     def get_string(self, object_id: int) -> BinaryObjectString:
         return self.__string_member_dictionary[object_id]
 
@@ -87,13 +89,8 @@ class ClassWithValues(Record, RecordWithValues):
         return self.__string_member_dictionary
 
     def get_text_recursively(self, object_id: int) -> str:
-        if self.has_bos_as_direct_child(object_id):
-            return self.get_string(object_id).get_string()
-
-        for member_record_with_value in self.__record_with_value_dictionary.values():
-            if member_record_with_value.has_bos_as_direct_child(object_id):
-                return member_record_with_value.get_text_recursively(object_id)
-
+        if self.has_bos_recursively(object_id):
+            return self.get_bos_recursively(object_id).get_string()
         raise Exception(f"{self} does not have member whose objectid='{object_id}'")
 
     def replace_text(self, new_string: str, object_id: int) -> None:

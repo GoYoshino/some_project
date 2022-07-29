@@ -131,10 +131,10 @@ class ClassWithMembersTest(unittest.TestCase):
         """
         直下のオブジェクトが正しく実装されたget_text()メソッドを持っている前提
         """
-        target_string = "ﾈｺﾁｬﾝ"
+        target = BinaryObjectString.from_params(27, "ﾈｺﾁｬﾝ")
         child_object = Mock(ClassWithValues)
-        child_object.get_text_recursively.return_value = target_string
-        child_object.has_bos_as_direct_child(27).return_vaule = True
+        child_object.has_bos_recursively.return_value = True
+        child_object.get_bos_recursively.return_value = target
         child_object.raw_bytes = b"nothing"
         values = ValueArray([BinaryObjectString.from_params(1, "dummy"), child_object])
 
