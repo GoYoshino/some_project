@@ -1,4 +1,4 @@
-from typing import BinaryIO, Dict
+from typing import BinaryIO, Dict, List, Optional
 
 from underrail_translation_kit.msnrbf_parser.record_with_values import RecordWithValues
 from .binary_object_string import BinaryObjectString
@@ -129,6 +129,7 @@ class ArraySingleString(Record, RecordWithValues):
             if (remaining_null_objects > 0):
                 remaining_null_objects -= 1
                 continue
+            # TODO: 古い実装を直す
             header = Int8.from_stream(stream)
             if header.raw_bytes == b"\x06":
                 value = BinaryObjectString.from_stream(stream)
@@ -146,6 +147,19 @@ class ArraySingleString(Record, RecordWithValues):
 
         return ArraySingleString(record_header, array_info, SerializedObjectArray(values), string_values)
 
+    @staticmethod
+    def fabricate(object_id: int, values: List[BinaryObjectString]):
+        dictionary = {}
+        for value in values:
+            dictionary[value.get_object_id()] = value
+        return ArraySingleString(
+            RecordHeader(RecordType.ArraySingleString),
+            ArrayInfo(Int32.from_value(object_id), Int32.from_value(len(values))),
+            SerializedObjectArray(values),
+            dictionary
+        )
+
+
     def get_object_id(self) -> int:
         return self.__array_info.get_object_id()
 
@@ -154,6 +168,12 @@ class ArraySingleString(Record, RecordWithValues):
 
     def has_bos_as_direct_child(self, object_id: int) -> bool:
         return object_id in self.__string_values_dict.keys()
+
+    def get_bos_recursively(self, object_id: int) -> Optional[BinaryObjectString]:
+        if object_id in self.__string_values_dict:
+            return self.__string_values_dict[object_id]
+        else:
+            return None
 
     def get_string(self, object_id: int) -> BinaryObjectString:
         return self.__string_values_dict[object_id]

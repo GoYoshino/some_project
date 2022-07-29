@@ -7,6 +7,7 @@ from underrail_translation_kit.msnrbf_parser.binary_object_string import BinaryO
 from underrail_translation_kit.msnrbf_parser.class_with_members_and_types import ClassWithMembersAndTypes
 from underrail_translation_kit.msnrbf_parser.class_with_values import ClassWithValues
 from underrail_translation_kit.msnrbf_parser.enums import BinaryType
+from underrail_translation_kit.msnrbf_parser.misc_record_classes import ArraySingleString
 from underrail_translation_kit.msnrbf_parser.object_null import ObjectNull
 from underrail_translation_kit.msnrbf_parser.primitives import RecordType, RecordHeader, Int32
 from underrail_translation_kit.msnrbf_parser.serialized_object import SerializedObject
@@ -26,6 +27,8 @@ class ClassWithMembersTest(unittest.TestCase):
                 result.append(BinaryType.Object)
             elif isinstance(value, ClassWithValues):
                 result.append(BinaryType.Class)
+            elif isinstance(value, ArraySingleString):
+                result.append(BinaryType.StringArray)
             else:
                 self.fail(f"not implemented for object: {value}")
 
@@ -126,8 +129,17 @@ class ClassWithMembersTest(unittest.TestCase):
         self.assertEqual(subject.find_text(32), "abcdefg")
 
     def test_get_text_from_member_array(self):
-        # 今の実装だとArrayがメンバのときは動かないはず
-        pass
+        array = ArraySingleString.fabricate(100, [
+            BinaryObjectString.from_params(32, "abcdefg"), BinaryObjectString.from_params(27, "ﾈｺﾁｬﾝ")])
+
+        subject = self.fabricate_with(500, [array])
+
+        self.assertEqual(subject.find_text(27), "ﾈｺﾁｬﾝ")
+        self.assertEqual(subject.find_text(32), "abcdefg")
+        self.assertEqual(subject.has_bos_recursively(27), True)
+        self.assertEqual(subject.has_bos_recursively(26), False)
+        with self.assertRaises(Exception):
+            subject.find_text(90)
 
     def test_get_text_recursively(self):
         """
@@ -176,6 +188,11 @@ class ClassWithMembersTest(unittest.TestCase):
         self.assertEqual(inuchan.get_string(), "ｲﾇﾁｬﾝ")
 
     def test_get_all_texts(self):
+        # TODO: テスト　すべてのテキストのリスティング
+        pass
+
+    def test_has_valid_byte_array(self):
+        # TODO: テスト　バイト列が正しく置換で保たれるか
         pass
 
 if __name__ == '__main__':

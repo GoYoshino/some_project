@@ -1,5 +1,5 @@
 import abc
-from typing import Dict
+from typing import Dict, Optional
 
 from underrail_translation_kit.msnrbf_parser.binary_object_string import BinaryObjectString
 
@@ -15,7 +15,7 @@ class RecordWithValues(metaclass=abc.ABCMeta):
     def has_bos_as_direct_child(self, object_id: int) -> bool:
         raise NotImplementedError()
 
-    def get_bos_recursively(self, object_id: int) -> BinaryObjectString:
+    def get_bos_recursively(self, object_id: int) -> Optional[BinaryObjectString]:
         raise NotImplementedError()
 
     def get_string(self, object_id: int) -> BinaryObjectString:
