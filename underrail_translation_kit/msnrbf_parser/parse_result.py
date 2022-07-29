@@ -27,7 +27,7 @@ class ParseResult(SerializedObjectArray):
         classes = self.get_member_class_dict()
         for key in classes:
             class_ = classes[key]
-            if class_.has_string(object_id):
+            if class_.has_bos_as_direct_child(object_id):
                 return class_
 
         raise Exception(f"could not find a class with id={object_id}")

@@ -13,7 +13,7 @@ class RecordWithValues(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
 
-    def has_string(self, object_id: int) -> bool:
+    def has_bos_as_direct_child(self, object_id: int) -> bool:
         raise NotImplementedError()
 
 

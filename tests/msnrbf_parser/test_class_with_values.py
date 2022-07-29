@@ -72,11 +72,11 @@ class ClassWithMembersTest(unittest.TestCase):
             BinaryObjectString.from_params(14, "ｶﾜｳｿﾁｬﾝ")
         ])
 
-        self.assertTrue(subject.has_string(27))
+        self.assertTrue(subject.has_bos_as_direct_child(27))
 
     def suspend_test_has_nekochan_in_child(self):
         nekochan_cage = Mock(ClassWithValues)
-        nekochan_cage.has_string.return_value = True
+        nekochan_cage.has_bos_as_direct_child.return_value = True
         nekochan_cage.raw_bytes = b"neko"
         subject = self.fabricate_with([
             nekochan_cage,
@@ -84,7 +84,7 @@ class ClassWithMembersTest(unittest.TestCase):
             BinaryObjectString.from_params(14, "ｶﾜｳｿﾁｬﾝ")
         ])
 
-        self.assertTrue(subject.has_string(27))
+        self.assertTrue(subject.has_bos_as_direct_child(27))
 
     def test_no_nekochan(self):
         subject = self.fabricate_with([
@@ -92,7 +92,7 @@ class ClassWithMembersTest(unittest.TestCase):
             BinaryObjectString.from_params(14, "ｶﾜｳｿﾁｬﾝ")
         ])
 
-        self.assertFalse(subject.has_string(27))
+        self.assertFalse(subject.has_bos_as_direct_child(27))
 
     def test_i_SAID_no_nekochan(self):
         record_header, class_info = self.fabricate_knickknacks()
@@ -113,7 +113,7 @@ class ClassWithMembersTest(unittest.TestCase):
         target_string = "ﾈｺﾁｬﾝ"
         child_object = Mock(ClassWithValues)
         child_object.get_text_recursively.return_value = target_string
-        child_object.has_string(27).return_vaule = True
+        child_object.has_bos_as_direct_child(27).return_vaule = True
         child_object.raw_bytes = b"nothing"
         values = ValueArray([BinaryObjectString.from_params(1, "dummy"), child_object])
 

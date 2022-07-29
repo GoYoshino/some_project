@@ -152,7 +152,7 @@ class ArraySingleString(Record, RecordWithValues):
     def get_name(self):
         return "array"
 
-    def has_string(self, object_id: int) -> bool:
+    def has_bos_as_direct_child(self, object_id: int) -> bool:
         return object_id in self.__string_values_dict.keys()
 
     def get_string(self, object_id: int) -> BinaryObjectString:
