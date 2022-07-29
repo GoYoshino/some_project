@@ -1,3 +1,4 @@
+import copy
 import unittest
 from typing import List
 
@@ -17,8 +18,8 @@ class ArraySingleStringTest(unittest.TestCase):
         nekochan = BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ")
         inuchan = BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ")
         values = [
-            BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ"),
-            BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ"),
+            nekochan,
+            inuchan,
         ]
 
         subject = ArraySingleString.fabricate(object_id, values)
@@ -35,8 +36,8 @@ class ArraySingleStringTest(unittest.TestCase):
         inuchan = BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ")
         values = [
             ObjectNull(),
-            BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ"),
-            BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ"),
+            nekochan,
+            inuchan
         ]
 
         subject = ArraySingleString.fabricate(object_id, values)
@@ -53,9 +54,9 @@ class ArraySingleStringTest(unittest.TestCase):
         nekochan = BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ")
         inuchan = BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ")
         values = [
-            BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ"),
+            nekochan,
             ObjectNullMultiple256.fabricate(4),
-            BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ"),
+            inuchan,
         ]
         subject = ArraySingleString.fabricate(object_id, values)
 
@@ -107,6 +108,29 @@ class ArraySingleStringTest(unittest.TestCase):
 
         self.assertEqual(subject.find_text(24), "ｵｼﾞｻﾝ")
         self.assertEqual(subject.find_text(18), "ｲﾇﾁｬﾝ")
+
+    def test_replacement_changes_raw_bytes(self):
+        object_id = 500
+        ojisan = BinaryObjectString.from_params(24, "ｵｼﾞｻﾝ")
+        inuchan = BinaryObjectString.from_params(18, "ｲﾇﾁｬﾝ")
+        values = [
+            ojisan,
+            inuchan
+        ]
+
+        subject = ArraySingleString.fabricate(object_id, values)
+        subject.replace_text("ﾈｺﾁｬﾝ", 24)
+        subject.recalc_raw_bytes()
+
+        self.assertEqual(ojisan.get_string(), "ﾈｺﾁｬﾝ")
+        self.assertEqual(ojisan.raw_bytes, BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ").raw_bytes)
+
+        expected_bytes = RecordHeader(RecordType.ArraySingleString).raw_bytes
+        expected_bytes += object_id.to_bytes(4, "little")
+        expected_bytes += (2).to_bytes(4, "little")
+        expected_bytes += BinaryObjectString.from_params(24, "ﾈｺﾁｬﾝ").raw_bytes
+        expected_bytes += inuchan.raw_bytes
+        self.assertEqual(subject.raw_bytes, expected_bytes)
 
     def get_all_texts(self):
         pass
