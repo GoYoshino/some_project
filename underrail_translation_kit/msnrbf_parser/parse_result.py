@@ -34,7 +34,7 @@ class ParseResult(SerializedObjectArray):
 
     def get_text(self, object_id: int) -> str:
         target_class = self.__find_target_record(object_id)
-        return target_class.get_text_recursively(object_id)
+        return target_class.find_text(object_id)
 
     def replace_text(self, new_text: str, object_id: int) -> None:
         """

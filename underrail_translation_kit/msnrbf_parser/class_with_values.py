@@ -88,7 +88,7 @@ class ClassWithValues(Record, RecordWithValues):
     def get_direct_child_string_member_dict(self) -> Dict[int, BinaryObjectString]:
         return self.__string_member_dictionary
 
-    def get_text_recursively(self, object_id: int) -> str:
+    def find_text(self, object_id: int) -> str:
         if self.has_bos_recursively(object_id):
             return self.get_bos_recursively(object_id).get_string()
         raise Exception(f"{self} does not have member whose objectid='{object_id}'")

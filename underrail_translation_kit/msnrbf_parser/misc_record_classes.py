@@ -161,7 +161,7 @@ class ArraySingleString(Record, RecordWithValues):
     def get_direct_child_string_member_dict(self) -> Dict[int, BinaryObjectString]:
         return self.__string_values_dict
 
-    def get_text_recursively(self, object_id: int) -> str:
+    def find_text(self, object_id: int) -> str:
         return self.get_string(object_id).get_string()
 
     def replace_text(self, new_string: str, object_id: int) -> None:

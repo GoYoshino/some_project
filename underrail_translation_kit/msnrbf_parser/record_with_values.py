@@ -27,7 +27,7 @@ class RecordWithValues(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
 
-    def get_text_recursively(self, object_id: int) -> str:
+    def find_text(self, object_id: int) -> str:
         raise NotImplementedError()
 
 

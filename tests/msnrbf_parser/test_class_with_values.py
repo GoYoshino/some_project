@@ -66,7 +66,7 @@ class ClassWithMembersTest(unittest.TestCase):
 
         subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
 
-        self.assertEqual(subject.get_text_recursively(32), "abcdefg")
+        self.assertEqual(subject.find_text(32), "abcdefg")
 
     def test_has_nekochan(self):
         subject = self.fabricate_with(1001, [
@@ -125,7 +125,7 @@ class ClassWithMembersTest(unittest.TestCase):
         subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
 
         with self.assertRaises(Exception):
-            subject.get_text_recursively(27)
+            subject.find_text(27)
 
     def test_get_text_recursively(self):
         """
@@ -142,9 +142,9 @@ class ClassWithMembersTest(unittest.TestCase):
         member_type_info = self.fabricate_mock_member_type_info(values)
 
         subject = ClassWithValues(record_header, class_info, member_type_info, [], values)
-        self.assertEqual("ﾈｺﾁｬﾝ", subject.get_text_recursively(27))
+        self.assertEqual("ﾈｺﾁｬﾝ", subject.find_text(27))
 
-    def test_replace_text_diret_child(self):
+    def test_replace_text_direct_child(self):
         pass
 
     def test_replace_text_recursively(self):
